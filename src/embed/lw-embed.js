@@ -1,6 +1,6 @@
 /**
  * LearnWorlds Audio-Text Embed Component
- * Version: 3.0.0 - Dual Audio Support (Vocal/Instrumental)
+ * Version: 3.1.0 - Custom Waveform Bar Player
  */
 (function () {
     'use strict';
@@ -14,9 +14,95 @@
     var vocalWidget = null;
     var instWidget = null;
     var isPlaying = false;
+    var isSeeking = false;
+    var audioDuration = 0;
+    var waveBars = [];
 
     function $(id) { return document.getElementById(id); }
     function $$(selector) { return document.querySelectorAll(selector); }
+
+    // Format time helper
+    function formatTime(ms) {
+        if (!ms || isNaN(ms)) return "0:00";
+        var totalSec = Math.floor(ms / 1000);
+        var min = Math.floor(totalSec / 60);
+        var sec = totalSec % 60;
+        return min + ":" + (sec < 10 ? "0" : "") + sec;
+    }
+
+    // Create waveform bars
+    function createWaveBars() {
+        var container = $('lw-wave-visualizer');
+        if (!container) return;
+
+        var count = 50; // Number of bars
+        var html = '';
+        for (var i = 0; i < count; i++) {
+            var height = Math.floor(Math.random() * 60) + 30; // 30-90%
+            var delay = (Math.random() * -1.2).toFixed(2);
+            html += '<div class="lw-wave-bar" data-bar="' + i + '" style="height:' + height + '%; animation-delay:' + delay + 's"></div>';
+        }
+
+        // Insert before the seek slider
+        var seekSlider = $('lw-seek-slider');
+        if (seekSlider) {
+            var temp = document.createElement('div');
+            temp.innerHTML = html;
+            while (temp.firstChild) {
+                container.insertBefore(temp.firstChild, seekSlider);
+            }
+        } else {
+            container.innerHTML = html;
+        }
+
+        waveBars = $$('.lw-wave-bar');
+    }
+
+    // Update waveform UI based on playback progress
+    function updateWaveUI(currentMs) {
+        if (audioDuration <= 0 || isSeeking) return;
+
+        var percent = currentMs / audioDuration;
+        var activeIndex = Math.floor(percent * waveBars.length);
+        var timeDisplay = $('lw-time-display');
+        var seekSlider = $('lw-seek-slider');
+
+        if (timeDisplay) timeDisplay.textContent = formatTime(currentMs);
+        if (seekSlider) seekSlider.value = currentMs;
+
+        for (var i = 0; i < waveBars.length; i++) {
+            if (i <= activeIndex) {
+                waveBars[i].classList.add('active');
+            } else {
+                waveBars[i].classList.remove('active');
+            }
+
+            if (isPlaying) {
+                waveBars[i].classList.add('animate');
+            } else {
+                waveBars[i].classList.remove('animate');
+            }
+        }
+    }
+
+    // Set play state UI
+    function setPlayStateUI(playing) {
+        isPlaying = playing;
+        var playBtn = $('lw-play-btn');
+        if (playBtn) {
+            playBtn.innerHTML = playing
+                ? '<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+                : '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+        }
+
+        for (var i = 0; i < waveBars.length; i++) {
+            if (playing) {
+                waveBars[i].classList.add('animate');
+            } else {
+                waveBars[i].classList.remove('animate');
+            }
+        }
+    }
 
     // Load SoundCloud Widget API
     function loadScWidgetApi(callback) {
@@ -71,90 +157,60 @@
             scVocal.src = SOUNDCLOUD_URL_VOCAL;
         }
 
-        if (scInst && typeof SOUNDCLOUD_URL_INSTRUMENTAL !== 'undefined' && SOUNDCLOUD_URL_INSTRUMENTAL) {
-            scInst.src = SOUNDCLOUD_URL_INSTRUMENTAL;
-            // Only initialize dual logic if we have both players
-            if (scVocal && toggleAudioBtn) {
-                // Determine layout mode
-                toggleAudioBtn.style.display = 'inline-flex';
+        // Create waveform bars
+        createWaveBars();
 
-                // Load API and init widgets
-                loadScWidgetApi(function () {
-                    vocalWidget = SC.Widget(scVocal);
-                    instWidget = SC.Widget(scInst);
+        // Load API for waveform player
+        loadScWidgetApi(function () {
+            vocalWidget = SC.Widget(scVocal);
 
-                    // Sync play state
-                    vocalWidget.bind(SC.Widget.Events.PLAY, function () { isPlaying = true; });
-                    vocalWidget.bind(SC.Widget.Events.PAUSE, function () { isPlaying = false; });
-                    instWidget.bind(SC.Widget.Events.PLAY, function () { isPlaying = true; });
-                    instWidget.bind(SC.Widget.Events.PAUSE, function () { isPlaying = false; });
+            // Vocal widget events
+            vocalWidget.bind(SC.Widget.Events.READY, function () {
+                vocalWidget.getDuration(function (d) {
+                    audioDuration = d;
+                    var seekSlider = $('lw-seek-slider');
+                    if (seekSlider) seekSlider.max = d;
+                });
+                // Get track title
+                vocalWidget.getCurrentSound(function (sound) {
+                    if (sound && sound.title) {
+                        var titleEl = $('lw-track-title');
+                        if (titleEl) titleEl.textContent = sound.title;
+                    }
+                });
+            });
+            vocalWidget.bind(SC.Widget.Events.PLAY, function () { setPlayStateUI(true); });
+            vocalWidget.bind(SC.Widget.Events.PAUSE, function () { setPlayStateUI(false); });
+            vocalWidget.bind(SC.Widget.Events.FINISH, function () { setPlayStateUI(false); updateWaveUI(0); });
+            vocalWidget.bind(SC.Widget.Events.PLAY_PROGRESS, function (e) {
+                if (activePlayer === 'vocal') updateWaveUI(e.currentPosition);
+            });
 
-                    // Ensure instrumental is ready
-                    instWidget.bind(SC.Widget.Events.READY, function () {
-                        instWidget.setVolume(100);
-                    });
+            // Instrumental setup (if available)
+            if (scInst && typeof SOUNDCLOUD_URL_INSTRUMENTAL !== 'undefined' && SOUNDCLOUD_URL_INSTRUMENTAL) {
+                scInst.src = SOUNDCLOUD_URL_INSTRUMENTAL;
+                instWidget = SC.Widget(scInst);
+
+                // Show mode switch
+                var modeSwitch = $('lw-mode-switch');
+                if (modeSwitch) {
+                    modeSwitch.style.display = 'flex';
+                }
+
+                instWidget.bind(SC.Widget.Events.READY, function () {
+                    instWidget.setVolume(100);
+                });
+                instWidget.bind(SC.Widget.Events.PLAY, function () { setPlayStateUI(true); });
+                instWidget.bind(SC.Widget.Events.PAUSE, function () { setPlayStateUI(false); });
+                instWidget.bind(SC.Widget.Events.FINISH, function () { setPlayStateUI(false); updateWaveUI(0); });
+                instWidget.bind(SC.Widget.Events.PLAY_PROGRESS, function (e) {
+                    if (activePlayer === 'instrumental') updateWaveUI(e.currentPosition);
                 });
             }
-        } else {
-            // Fallback for single player (old style or vocal only) -> Rename ID in HTML or handle legacy
-            // If only vocal is present, we are fine.
-            if (toggleAudioBtn) toggleAudioBtn.style.display = 'none';
-        }
+        });
 
         bindEvents();
         updateDisplay();
-    }
-
-    function toggleAudioMode() {
-        if (!vocalWidget || !instWidget) return;
-
-        var btn = $('btnAudioToggle');
-        var iconVocal = btn.querySelector('.icon-vocal');
-        var iconInst = btn.querySelector('.icon-inst');
-        var scVocalContainer = $('lw-audio-vocal');
-        var scInstContainer = $('lw-audio-inst');
-
-        if (activePlayer === 'vocal') {
-            // Switch to Instrumental
-            vocalWidget.getPosition(function (pos) {
-                vocalWidget.pause();
-
-                instWidget.seekTo(pos);
-                if (isPlaying) {
-                    instWidget.play();
-                }
-
-                // UI Update
-                scVocalContainer.style.display = 'none';
-                scInstContainer.style.display = 'block';
-                activePlayer = 'instrumental';
-
-                // Show Microphone icon (to switch back to vocal)
-                iconVocal.style.display = 'inline-flex';
-                iconInst.style.display = 'none';
-                btn.title = "Vokal'e Geç";
-            });
-        } else {
-            // Switch to Vocal
-            instWidget.getPosition(function (pos) {
-                instWidget.pause();
-
-                vocalWidget.seekTo(pos);
-                if (isPlaying) {
-                    vocalWidget.play();
-                }
-
-                // UI Update
-                scInstContainer.style.display = 'none';
-                scVocalContainer.style.display = 'block';
-                activePlayer = 'vocal';
-
-                // Show Music icon (to switch back to instrumental)
-                iconVocal.style.display = 'none';
-                iconInst.style.display = 'inline-flex';
-                btn.title = "Enstrümantal'e Geç";
-            });
-        }
     }
 
     function bindEvents() {
@@ -164,7 +220,11 @@
         var btnHideAll = $('btnVerbergAlles');
         var btnShowAll = $('btnToonAlles');
         var btnPrint = $('btnAfdrukken');
-        var btnAudioToggle = $('btnAudioToggle');
+
+        // Custom audio player controls
+        var playBtn = $('lw-play-btn');
+        var seekSlider = $('lw-seek-slider');
+        var modeBtns = $$('.lw-mode-btn');
 
         if (btnPrev) btnPrev.onclick = function () { if (currentIndex > 0) { currentIndex--; updateDisplay(); scrollToCurrentParagraph(); } };
         if (btnNext) btnNext.onclick = function () { if (currentIndex < totalParagraphs - 1) { currentIndex++; updateDisplay(); scrollToCurrentParagraph(); } };
@@ -172,7 +232,91 @@
         if (btnHideAll) btnHideAll.onclick = function () { setAllParagraphs(true); };
         if (btnShowAll) btnShowAll.onclick = function () { setAllParagraphs(false); };
         if (btnPrint) btnPrint.onclick = handlePrint;
-        if (btnAudioToggle) btnAudioToggle.onclick = toggleAudioMode;
+
+        // Play/Pause button
+        if (playBtn) {
+            playBtn.onclick = function () {
+                var widget = activePlayer === 'vocal' ? vocalWidget : instWidget;
+                if (widget) widget.toggle();
+            };
+        }
+
+        // Mode switch buttons (Vocal/Instrumental)
+        for (var m = 0; m < modeBtns.length; m++) {
+            modeBtns[m].onclick = function () {
+                var newMode = this.getAttribute('data-mode');
+                if (newMode === activePlayer) return;
+
+                // Update button UI
+                for (var n = 0; n < modeBtns.length; n++) {
+                    modeBtns[n].classList.remove('active');
+                }
+                this.classList.add('active');
+
+                // Switch audio
+                var statusEl = $('lw-track-status');
+                if (newMode === 'instrumental' && vocalWidget && instWidget) {
+                    vocalWidget.getPosition(function (pos) {
+                        vocalWidget.pause();
+                        instWidget.seekTo(pos);
+                        if (isPlaying) instWidget.play();
+                        activePlayer = 'instrumental';
+                        if (statusEl) statusEl.textContent = 'INSTRUMENTAL';
+                    });
+                } else if (newMode === 'vocal' && vocalWidget && instWidget) {
+                    instWidget.getPosition(function (pos) {
+                        instWidget.pause();
+                        vocalWidget.seekTo(pos);
+                        if (isPlaying) vocalWidget.play();
+                        activePlayer = 'vocal';
+                        if (statusEl) statusEl.textContent = 'VOCAL';
+                    });
+                }
+            };
+        }
+
+        // Seek slider
+        if (seekSlider) {
+            seekSlider.onmousedown = function () {
+                isSeeking = true;
+            };
+
+            seekSlider.ontouchstart = function () {
+                isSeeking = true;
+            };
+
+            seekSlider.oninput = function () {
+                var ms = parseInt(this.value);
+                var timeDisplay = $('lw-time-display');
+                if (timeDisplay) timeDisplay.textContent = formatTime(ms);
+
+                // Visual feedback during drag
+                var percent = audioDuration > 0 ? (ms / audioDuration) : 0;
+                var activeIndex = Math.floor(percent * waveBars.length);
+                for (var i = 0; i < waveBars.length; i++) {
+                    if (i <= activeIndex) {
+                        waveBars[i].classList.add('active');
+                    } else {
+                        waveBars[i].classList.remove('active');
+                    }
+                }
+            };
+
+            seekSlider.onchange = function () {
+                var ms = parseInt(this.value);
+                var widget = activePlayer === 'vocal' ? vocalWidget : instWidget;
+                if (widget) widget.seekTo(ms);
+                isSeeking = false;
+            };
+
+            seekSlider.onmouseup = function () {
+                isSeeking = false;
+            };
+
+            seekSlider.ontouchend = function () {
+                isSeeking = false;
+            };
+        }
 
         // Paragraph click events
         var wrappers = $$('.lw-para-wrap');

@@ -17,60 +17,60 @@ import lwEmbedJsRaw from "../embed/lw-embed.js?raw";
 const SVG_PATTERNS = {
   // Flower/Clover - User's design (scaled to fit viewBox)
   "flower": {
-    name: "� Çiçek",
+    name: "🌸 Flower",
     topLeft: `<path transform="scale(0.9) translate(-20,-20)" d="M41.43,87.43c-2.62-1.17-4.18-1.81-5.69-2.54A42.67,42.67,0,0,1,19,70.58c-5.44-7.88-6.47-16.4-3.67-25.36C18,36.57,24.71,30.8,36,33.42c7.14,1.65,13.81,5.3,20.68,8.09,1.26.52,2.45,1.21,3.42,1.69,2.08-1.2,1.74-2.74,1.44-4-2.4-10.6,1.51-19.72,6.83-28.4a21.58,21.58,0,0,1,5.9-6.11c11.62-8.16,31.82-5.19,40.61,5.85,3,3.68,4.65,7.83,4.21,12.7-.33,3.63-.5,7.27-.79,11.63,2.68-1.39,4.71-2.36,6.66-3.46,10.9-6.18,22.22-6.68,33.9-2.58a47.34,47.34,0,0,1,4.84,1.77,21.79,21.79,0,0,1,11.95,13.62C178,51.34,177,57.36,174.22,64,168.71,77.31,159,85.74,145.68,90.54A41,41,0,0,0,142,92.38a68.91,68.91,0,0,0,7.17,3.94,59.43,59.43,0,0,1,19.27,12.61,24.61,24.61,0,0,1,7.83,16.65c.48,9.35-6.85,19.15-16.38,21.58a39.76,39.76,0,0,1-32.1-5.16c-2.59-1.63-5.14-3.31-8.49-5.48-.29,2.19-.75,3.51-.58,4.75,1.53,11.38-.87,22.23-5,32.68-1.91,4.88-5.49,8.33-11.41,9.15-4.3.61-8.42,1.1-12.7.17a20.8,20.8,0,0,1-13.18-8.88c-5.1-7.48-8.41-15.61-8.54-24.81,0-4,0-8,0-12.8a17.91,17.91,0,0,0-3.32,1.75c-8.76,7.73-18.67,13.27-30.23,15.4-12.51,2.31-23.17-1-31.38-11.1C.74,140.07-.81,131.7.45,127.2,2.07,121.42,4.18,115.84,8,111c8-10,17.45-17.89,29.81-21.89C38.63,88.86,39.36,88.41,41.43,87.43Z"/>`,
     bottomRight: `<path transform="scale(0.9) translate(130,130)" d="M41.43,87.43c-2.62-1.17-4.18-1.81-5.69-2.54A42.67,42.67,0,0,1,19,70.58c-5.44-7.88-6.47-16.4-3.67-25.36C18,36.57,24.71,30.8,36,33.42c7.14,1.65,13.81,5.3,20.68,8.09,1.26.52,2.45,1.21,3.42,1.69,2.08-1.2,1.74-2.74,1.44-4-2.4-10.6,1.51-19.72,6.83-28.4a21.58,21.58,0,0,1,5.9-6.11c11.62-8.16,31.82-5.19,40.61,5.85,3,3.68,4.65,7.83,4.21,12.7-.33,3.63-.5,7.27-.79,11.63,2.68-1.39,4.71-2.36,6.66-3.46,10.9-6.18,22.22-6.68,33.9-2.58a47.34,47.34,0,0,1,4.84,1.77,21.79,21.79,0,0,1,11.95,13.62C178,51.34,177,57.36,174.22,64,168.71,77.31,159,85.74,145.68,90.54A41,41,0,0,0,142,92.38a68.91,68.91,0,0,0,7.17,3.94,59.43,59.43,0,0,1,19.27,12.61,24.61,24.61,0,0,1,7.83,16.65c.48,9.35-6.85,19.15-16.38,21.58a39.76,39.76,0,0,1-32.1-5.16c-2.59-1.63-5.14-3.31-8.49-5.48-.29,2.19-.75,3.51-.58,4.75,1.53,11.38-.87,22.23-5,32.68-1.91,4.88-5.49,8.33-11.41,9.15-4.3.61-8.42,1.1-12.7.17a20.8,20.8,0,0,1-13.18-8.88c-5.1-7.48-8.41-15.61-8.54-24.81,0-4,0-8,0-12.8a17.91,17.91,0,0,0-3.32,1.75c-8.76,7.73-18.67,13.27-30.23,15.4-12.51,2.31-23.17-1-31.38-11.1C.74,140.07-.81,131.7.45,127.2,2.07,121.42,4.18,115.84,8,111c8-10,17.45-17.89,29.81-21.89C38.63,88.86,39.36,88.41,41.43,87.43Z"/>`
   },
   // Leaf organic shape
   "leaf": {
-    name: "🍃 Yaprak",
+    name: "🍃 Leaf",
     topLeft: `<path d="M10,160 Q10,10 160,10 Q80,80 80,160 Q80,80 10,160 Z"/>`,
     bottomRight: `<path d="M310,160 Q310,310 160,310 Q240,240 240,160 Q240,240 310,160 Z"/>`
   },
   // Simple circle/blob
   "circle": {
-    name: "⭕ Daire",
+    name: "⭕ Circle",
     topLeft: `<circle cx="80" cy="80" r="120"/>`,
     bottomRight: `<circle cx="240" cy="240" r="140"/>`
   },
   // Cloud shape
   "cloud": {
-    name: "☁️ Bulut",
+    name: "☁️ Cloud",
     topLeft: `<path d="M20,120 Q20,60 80,60 Q100,20 140,40 Q180,20 180,60 Q220,60 200,100 Q220,140 180,140 Q160,180 100,160 Q40,180 20,120 Z"/>`,
     bottomRight: `<path d="M140,280 Q140,220 200,220 Q220,180 260,200 Q300,180 300,220 Q340,220 320,260 Q340,300 300,300 Q280,340 220,320 Q160,340 140,280 Z"/>`
   },
   // Star
   "star": {
-    name: "⭐ Yıldız",
+    name: "⭐ Star",
     topLeft: `<polygon points="80,10 95,60 150,60 105,95 120,150 80,115 40,150 55,95 10,60 65,60"/>`,
     bottomRight: `<polygon points="240,170 260,230 320,230 270,270 290,330 240,290 190,330 210,270 160,230 220,230"/>`
   },
   // Heart
   "heart": {
-    name: "❤️ Kalp",
+    name: "❤️ Heart",
     topLeft: `<path d="M80,40 C80,20 55,10 40,25 C10,50 80,120 80,120 C80,120 150,50 120,25 C105,10 80,20 80,40 Z"/>`,
     bottomRight: `<path d="M240,200 C240,180 215,170 200,185 C170,210 240,280 240,280 C240,280 310,210 280,185 C265,170 240,180 240,200 Z"/>`
   },
   // Music note
   "music": {
-    name: "🎵 Nota",
+    name: "🎵 Note",
     topLeft: `<g><ellipse cx="50" cy="110" rx="25" ry="18"/><rect x="72" y="30" width="6" height="82"/><ellipse cx="110" cy="80" rx="22" ry="16"/><rect x="130" y="15" width="6" height="67"/><path d="M78,30 Q105,15 136,20" stroke-width="6" fill="none"/></g>`,
     bottomRight: `<g><ellipse cx="230" cy="280" rx="22" ry="16"/><rect x="249" y="205" width="5" height="77"/><ellipse cx="280" cy="255" rx="20" ry="14"/><rect x="297" y="190" width="5" height="67"/></g>`
   },
   // Waves
   "wave": {
-    name: "� Dalga",
+    name: "🌊 Wave",
     topLeft: `<path d="M-20,80 Q30,40 80,80 Q130,120 180,80 Q230,40 280,80 L280,180 Q230,140 180,180 Q130,220 80,180 Q30,140 -20,180 Z"/>`,
     bottomRight: `<path d="M40,260 Q90,220 140,260 Q190,300 240,260 Q290,220 340,260 L340,340 Q290,300 240,340 Q190,380 140,340 Q90,300 40,340 Z"/>`
   },
   // Sparkle/Diamond
   "sparkle": {
-    name: "✨ Parıltı",
+    name: "✨ Sparkle",
     topLeft: `<g><polygon points="60,10 70,50 110,60 70,70 60,110 50,70 10,60 50,50"/><polygon points="120,60 127,85 150,90 127,95 120,120 113,95 90,90 113,85" opacity="0.6"/></g>`,
     bottomRight: `<g><polygon points="250,200 265,250 310,265 265,280 250,330 235,280 190,265 235,250"/><polygon points="190,250 198,278 225,285 198,292 190,320 182,292 155,285 182,278" opacity="0.6"/></g>`
   },
   "none": {
-    name: "❌ Desen Yok",
+    name: "❌ No Pattern",
     topLeft: "",
     bottomRight: ""
   }
@@ -80,7 +80,7 @@ const FONT_OPTIONS = [
   { value: "Quicksand", label: "Quicksand" },
   { value: "Fredoka", label: "Fredoka" },
   { value: "Nunito", label: "Nunito" },
-  { value: "system-ui", label: "Sistem Fontu" },
+  { value: "system-ui", label: "System Font" },
   { value: "Comic Sans MS", label: "Comic Sans" },
   { value: "Arial Rounded MT Bold", label: "Arial Rounded" },
 ];
@@ -178,6 +178,9 @@ const GatenTekstGenerator = () => {
 
   // Word styles
   const [wordColor, setWordColor] = useState("#ea580c");
+
+  // Player styles
+  const [playerColor, setPlayerColor] = useState("#f97316"); // Orange-500
   const [placeholderColor, setPlaceholderColor] = useState("#dc2626");
 
   // Panel styles
@@ -278,24 +281,10 @@ const GatenTekstGenerator = () => {
   --lw-title-size: ${titleSize[0]}rem;
   --lw-author-color: ${authorColor};
   --lw-author-size: ${authorSize[0]}rem;
+  --lw-player-color: ${playerColor};
 }`;
 
-    // Toggle button html with SVGs and Text
-    // Initially hidden (display:none), JS will show it if both URLs exist
-    const toggleButtonHtml = `
-        <button class="lw-btn tog" id="btnAudioToggle" title="Mod Değiştir" style="display:none; min-width:160px; justify-content:center;">
-          <span class="icon-vocal" style="display:none; align-items:center; gap:8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
-            <span>Vocal</span>
-          </span>
-          <span class="icon-inst" style="display:flex; align-items:center; gap:8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" x2="23" y1="1" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94 0v5.8"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
-            <span>Instrumental</span>
-          </span>
-        </button>
-        <div class="lw-div"></div>`;
-
-    return `<!-- ${escapeHtml(displayTitle)} - LearnWorlds Embed v3.0 -->
+    return `<!-- ${escapeHtml(displayTitle)} - LearnWorlds Embed v3.1 -->
 <style data-lw-embed>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
 ${cssVars}
@@ -347,19 +336,48 @@ ${textHtml}
         <button class="lw-btn" id="btnVerbergAlles">Alles ▼</button>
         <button class="lw-btn" id="btnToonAlles">Alles ▲</button>
         <div class="lw-div"></div>
-        <button class="lw-btn pr icon-btn" id="btnAfdrukken" title="Yazdır">
+        <button class="lw-btn pr icon-btn" id="btnAfdrukken" title="Print">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
         </button>
-        <div class="lw-div"></div>
-        ${toggleButtonHtml}
       </div>
     </div>
 
-    <!-- Dual Audio Containers -->
-    <div class="lw-audio" id="lw-audio-vocal">
-      <iframe id="lw-sc-vocal" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${soundCloudUrl}"></iframe>
+    <!-- Custom Audio Player -->
+    <div class="lw-audio-player">
+      <div class="lw-audio-player-content">
+        <button class="lw-play-btn" id="lw-play-btn">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        
+        <!-- Track Info -->
+        <div class="lw-track-info">
+          <div class="lw-track-status" id="lw-track-status">VOCAL</div>
+          <div class="lw-track-title" id="lw-track-title">Loading...</div>
+        </div>
+        
+        <div class="lw-wave-container" id="lw-wave-visualizer">
+          <input type="range" class="lw-seek-slider" id="lw-seek-slider" min="0" max="100" value="0" step="0.1">
+        </div>
+        
+        <div class="lw-time-display" id="lw-time-display">0:00</div>
+        
+        <!-- Mode Switch (Vocal/Instrumental) -->
+        <div class="lw-mode-switch" id="lw-mode-switch" style="display:none;">
+          <button class="lw-mode-btn active" data-mode="vocal">
+            <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
+            Vocal
+          </button>
+          <button class="lw-mode-btn" data-mode="instrumental">
+            <svg viewBox="0 0 24 24"><line x1="1" x2="23" y1="1" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94 0v5.8"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
+            Inst
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="lw-audio" id="lw-audio-inst" style="display:none;">
+
+    <!-- Hidden Iframes for SoundCloud API -->
+    <div class="lw-sc-hidden">
+      <iframe id="lw-sc-vocal" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${soundCloudUrl}"></iframe>
       <iframe id="lw-sc-inst" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${soundCloudUrlInst}"></iframe>
     </div>
 
@@ -375,7 +393,8 @@ ${inlineJs}
 <\/script>`;
   }, [title, author, extractedUrl, extractedUrlInstrumental, lyrics, pageBgColor, topLeftPattern, bottomRightPattern,
     patternColor, patternOpacity, convertedImage1, convertedImage2, showImages, imageSize,
-    fontFamily, fontSize, textColor, wordColor, placeholderColor, panelBgColor, useGlass]);
+    fontFamily, fontSize, textColor, wordColor, placeholderColor, panelBgColor, useGlass, playerColor,
+    titleColor, titleSize, authorColor, authorSize]);
 
   const previewHtml = useMemo(() => {
     const displayTitle = title || 'Title';
@@ -431,19 +450,19 @@ ${inlineJs}
         <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4 h-14 rounded-2xl bg-muted p-1">
           <TabsTrigger value="editor" className="rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <FileText className="w-4 h-4 mr-1" />
-            İçerik
+            Content
           </TabsTrigger>
           <TabsTrigger value="style" className="rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Palette className="w-4 h-4 mr-1" />
-            Stil
+            Style
           </TabsTrigger>
           <TabsTrigger value="preview" className="rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Eye className="w-4 h-4 mr-1" />
-            Önizleme
+            Preview
           </TabsTrigger>
           <TabsTrigger value="code" className="rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Copy className="w-4 h-4 mr-1" />
-            Kod
+            Code
           </TabsTrigger>
         </TabsList>
 
@@ -454,21 +473,21 @@ ${inlineJs}
               {/* Left Column - Basic Info */}
               <div className="space-y-4">
                 <div>
-                  <Label className="font-bold text-foreground mb-2 block">Başlık</Label>
+                  <Label className="font-bold text-foreground mb-2 block">Title</Label>
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Şarkı başlığını girin..."
+                    placeholder="Enter song title..."
                     className="input-playful"
                   />
                 </div>
 
                 <div>
-                  <Label className="font-bold text-foreground mb-2 block">Sanatçı / Yazar</Label>
+                  <Label className="font-bold text-foreground mb-2 block">Artist / Author</Label>
                   <Input
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
-                    placeholder="Sanatçı adını girin..."
+                    placeholder="Enter artist name..."
                     className="input-playful"
                   />
                 </div>
@@ -476,7 +495,7 @@ ${inlineJs}
                 <div>
                   <Label className="font-bold text-foreground mb-2 flex items-center gap-2">
                     <Music className="w-4 h-4" />
-                    SoundCloud Embed Kodu
+                    SoundCloud Embed Code
                   </Label>
                   <Textarea
                     value={soundcloudEmbed}
@@ -489,7 +508,7 @@ ${inlineJs}
                       ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600'
                       : 'bg-red-500/10 border border-red-500/30 text-red-600'
                       }`}>
-                      {extractedUrl ? `✓ URL bulundu` : `✗ URL bulunamadı`}
+                      {extractedUrl ? `✓ URL found` : `✗ URL not found`}
                     </div>
                   )}
                 </div>
@@ -497,12 +516,12 @@ ${inlineJs}
                 <div>
                   <Label className="font-bold text-foreground mb-2 flex items-center gap-2">
                     <Music className="w-4 h-4" />
-                    SoundCloud Enstrümantal (Opsiyonel)
+                    SoundCloud Instrumental (Optional)
                   </Label>
                   <Textarea
                     value={soundcloudEmbedInstrumental}
                     onChange={(e) => setSoundcloudEmbedInstrumental(e.target.value)}
-                    placeholder='Enstrümantal versiyon embed kodu...'
+                    placeholder='Instrumental version embed code...'
                     className="input-playful font-mono text-sm min-h-[80px]"
                   />
                   {soundcloudEmbedInstrumental.trim() && (
@@ -510,7 +529,7 @@ ${inlineJs}
                       ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600'
                       : 'bg-red-500/10 border border-red-500/30 text-red-600'
                       }`}>
-                      {extractedUrlInstrumental ? `✓ URL bulundu` : `✗ URL bulunamadı`}
+                      {extractedUrlInstrumental ? `✓ URL found` : `✗ URL not found`}
                     </div>
                   )}
                 </div>
@@ -519,18 +538,18 @@ ${inlineJs}
                 <div className="p-4 bg-muted/50 rounded-xl space-y-3">
                   <Label className="font-bold text-foreground flex items-center gap-2">
                     <Image className="w-4 h-4" />
-                    Karakter Resimleri
+                    Character Images
                   </Label>
 
                   <div className="flex items-center gap-2">
                     <Switch checked={showImages} onCheckedChange={setShowImages} />
-                    <span className="text-sm">Resimleri göster</span>
+                    <span className="text-sm">Show images</span>
                   </div>
 
                   {showImages && (
                     <>
                       <div>
-                        <Label className="text-sm text-muted-foreground mb-1 block">Sol Üst Resim (Google Drive)</Label>
+                        <Label className="text-sm text-muted-foreground mb-1 block">Left Top Image (Google Drive)</Label>
                         <Input
                           value={leftImageUrl1}
                           onChange={(e) => setLeftImageUrl1(e.target.value)}
@@ -538,11 +557,11 @@ ${inlineJs}
                           className="input-playful text-xs"
                         />
                         {convertedImage1 && leftImageUrl1 !== convertedImage1 && (
-                          <p className="text-xs text-emerald-600 mt-1">✓ Link dönüştürüldü</p>
+                          <p className="text-xs text-emerald-600 mt-1">✓ Link converted</p>
                         )}
                       </div>
                       <div>
-                        <Label className="text-sm text-muted-foreground mb-1 block">Sol Alt Resim (Google Drive)</Label>
+                        <Label className="text-sm text-muted-foreground mb-1 block">Left Bottom Image (Google Drive)</Label>
                         <Input
                           value={leftImageUrl2}
                           onChange={(e) => setLeftImageUrl2(e.target.value)}
@@ -552,7 +571,7 @@ ${inlineJs}
                       </div>
                       <div>
                         <Label className="text-sm text-muted-foreground mb-1 block">
-                          Resim Boyutu: {imageSize[0]}px
+                          Image Size: {imageSize[0]}px
                         </Label>
                         <Slider
                           value={imageSize}
@@ -565,7 +584,7 @@ ${inlineJs}
                       </div>
                       <div>
                         <Label className="text-sm text-muted-foreground mb-1 block">
-                          Kenardan Uzaklık: {imageMargin[0]}px
+                          Edge Margin: {imageMargin[0]}px
                         </Label>
                         <Slider
                           value={imageMargin}
@@ -585,27 +604,27 @@ ${inlineJs}
               <div>
                 <Label className="font-bold text-foreground mb-2 flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  Şarkı Sözleri
+                  Lyrics
                 </Label>
                 <Textarea
                   value={lyrics}
                   onChange={(e) => setLyrics(e.target.value)}
-                  placeholder={`Şarkı sözlerini girin...
+                  placeholder={`Enter lyrics...
 
-Her kıta boş satırla ayrılmalı.
+Each verse should be separated by blank lines.
 
-Örnek:
-Birinci satır
-İkinci satır
+Example:
+First line
+Second line
 
-Üçüncü satır
-Dördüncü satır
+Third line
+Fourth line
 
-Gizlenecek kelimeleri parantez içine alın: (kelime)`}
+Wrap hidden words in parentheses: (word)`}
                   className="input-playful font-mono min-h-[400px]"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  💡 Gizlenecek kelimeler: <code className="bg-muted px-1 rounded">(kelime)</code>
+                  💡 Hidden words: <code className="bg-muted px-1 rounded">(word)</code>
                 </p>
               </div>
             </div>
@@ -614,15 +633,15 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
             <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-border">
               <Button onClick={copyToClipboard} className="btn-playful bg-primary hover:bg-primary/90">
                 {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-                {copied ? "Kopyalandı!" : "Kodu Kopyala"}
+                {copied ? "Copied!" : "Copy Code"}
               </Button>
               <Button onClick={saveAsFile} className="btn-playful bg-amber-500 hover:bg-amber-500/90 text-white">
                 <Download className="w-4 h-4 mr-2" />
-                Dosya Kaydet
+                Save File
               </Button>
               <Button onClick={clearAll} variant="outline" className="rounded-xl">
                 <Trash2 className="w-4 h-4 mr-2" />
-                Temizle
+                Clear
               </Button>
             </div>
           </div>
@@ -637,7 +656,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
               <div className="p-4 bg-muted/50 rounded-xl space-y-3">
                 <h3 className="font-bold flex items-center gap-2">
                   <Palette className="w-4 h-4" />
-                  Sayfa Arka Planı
+                  Page Background
                 </h3>
                 <div className="flex items-center gap-3">
                   <input
@@ -658,11 +677,11 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
               <div className="p-4 bg-muted/50 rounded-xl space-y-3 md:col-span-2">
                 <h3 className="font-bold flex items-center gap-2">
                   <Sparkles className="w-4 h-4" />
-                  Köşe Desenleri
+                  Corner Patterns
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Sol Üst</Label>
+                    <Label className="text-xs text-muted-foreground">Top Left</Label>
                     <Select value={topLeftPattern} onValueChange={setTopLeftPattern}>
                       <SelectTrigger className="input-playful">
                         <SelectValue />
@@ -675,7 +694,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Sağ Alt</Label>
+                    <Label className="text-xs text-muted-foreground">Bottom Right</Label>
                     <Select value={bottomRightPattern} onValueChange={setBottomRightPattern}>
                       <SelectTrigger className="input-playful">
                         <SelectValue />
@@ -691,7 +710,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col gap-1 items-center">
-                      <Label className="text-xs text-muted-foreground">Renk</Label>
+                      <Label className="text-xs text-muted-foreground">Color</Label>
                       <input
                         type="color"
                         value={patternColor}
@@ -701,7 +720,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                     </div>
                     <div className="flex-1">
                       <Label className="text-xs text-muted-foreground flex justify-between">
-                        <span>Opaklık</span>
+                        <span>Opacity</span>
                         <span>{patternOpacity[0].toFixed(2)}</span>
                       </Label>
                       <Slider
@@ -718,7 +737,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-xs text-muted-foreground flex justify-between">
-                        <span>Boyut</span>
+                        <span>Size</span>
                         <span>{patternSize[0]}px</span>
                       </Label>
                       <Slider
@@ -732,7 +751,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground flex justify-between">
-                        <span>Uzaklık</span>
+                        <span>Margin</span>
                         <span>{patternMargin[0]}px</span>
                       </Label>
                       <Slider
@@ -752,11 +771,11 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
               <div className="p-4 bg-muted/50 rounded-xl space-y-3">
                 <h3 className="font-bold flex items-center gap-2">
                   <Type className="w-4 h-4" />
-                  Yazı Ayarları
+                  Typography
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <Label className="text-xs text-muted-foreground mb-1 block">Yazı Tipi</Label>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Font</Label>
                     <Select value={fontFamily} onValueChange={setFontFamily}>
                       <SelectTrigger className="input-playful">
                         <SelectValue />
@@ -771,7 +790,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
 
                   {/* Title Style */}
                   <div className="border-t border-border/50 pt-2">
-                    <Label className="text-xs font-bold text-muted-foreground mb-2 block">Başlık Stili</Label>
+                    <Label className="text-xs font-bold text-muted-foreground mb-2 block">Title Style</Label>
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col gap-1 items-center">
                         <input
@@ -779,12 +798,12 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                           value={titleColor}
                           onChange={(e) => setTitleColor(e.target.value)}
                           className="w-8 h-8 rounded cursor-pointer border border-border"
-                          title="Başlık Rengi"
+                          title="Title Color"
                         />
                       </div>
                       <div className="flex-1">
                         <Label className="text-[10px] text-muted-foreground flex justify-between">
-                          <span>Boyut</span>
+                          <span>Size</span>
                           <span>{titleSize[0]}rem</span>
                         </Label>
                         <Slider
@@ -801,7 +820,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
 
                   {/* Author Style */}
                   <div className="border-t border-border/50 pt-2">
-                    <Label className="text-xs font-bold text-muted-foreground mb-2 block">Yazar Stili</Label>
+                    <Label className="text-xs font-bold text-muted-foreground mb-2 block">Author Style</Label>
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col gap-1 items-center">
                         <input
@@ -809,12 +828,12 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                           value={authorColor}
                           onChange={(e) => setAuthorColor(e.target.value)}
                           className="w-8 h-8 rounded cursor-pointer border border-border"
-                          title="Yazar Rengi"
+                          title="Author Color"
                         />
                       </div>
                       <div className="flex-1">
                         <Label className="text-[10px] text-muted-foreground flex justify-between">
-                          <span>Boyut</span>
+                          <span>Size</span>
                           <span>{authorSize[0]}rem</span>
                         </Label>
                         <Slider
@@ -831,7 +850,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
 
                   {/* Body Style */}
                   <div className="border-t border-border/50 pt-2">
-                    <Label className="text-xs font-bold text-muted-foreground mb-2 block">İçerik Stili</Label>
+                    <Label className="text-xs font-bold text-muted-foreground mb-2 block">Body Style</Label>
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col gap-1 items-center">
                         <input
@@ -839,12 +858,12 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                           value={textColor}
                           onChange={(e) => setTextColor(e.target.value)}
                           className="w-8 h-8 rounded cursor-pointer border border-border"
-                          title="Metin Rengi"
+                          title="Text Color"
                         />
                       </div>
                       <div className="flex-1">
                         <Label className="text-[10px] text-muted-foreground flex justify-between">
-                          <span>Boyut</span>
+                          <span>Size</span>
                           <span>{fontSize[0]}rem</span>
                         </Label>
                         <Slider
@@ -863,7 +882,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
 
               {/* Word Styles */}
               <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                <h3 className="font-bold">Gizlenecek Kelimeler</h3>
+                <h3 className="font-bold">Hidden Words</h3>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
@@ -871,7 +890,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                     onChange={(e) => setWordColor(e.target.value)}
                     className="w-8 h-6 rounded cursor-pointer border border-border"
                   />
-                  <span className="text-xs">Kelime Rengi</span>
+                  <span className="text-xs">Word Color</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -880,13 +899,13 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                     onChange={(e) => setPlaceholderColor(e.target.value)}
                     className="w-8 h-6 rounded cursor-pointer border border-border"
                   />
-                  <span className="text-xs">Gizli Rengi</span>
+                  <span className="text-xs">Hidden Color</span>
                 </div>
               </div>
 
               {/* Panel Styles */}
               <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                <h3 className="font-bold">Panel Stilleri</h3>
+                <h3 className="font-bold">Panel Styles</h3>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
@@ -894,11 +913,31 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
                     onChange={(e) => setPanelBgColor(e.target.value)}
                     className="w-10 h-8 rounded cursor-pointer border border-border"
                   />
-                  <span className="text-sm">Arka Plan</span>
+                  <span className="text-sm">Background</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch checked={useGlass} onCheckedChange={setUseGlass} />
-                  <span className="text-sm">Glass Efekt</span>
+                  <span className="text-sm">Glass Effect</span>
+                </div>
+              </div>
+
+              {/* Player Styles */}
+              <div className="p-4 bg-muted/50 rounded-xl space-y-3">
+                <h3 className="font-bold flex items-center gap-2">
+                  <Music className="w-4 h-4" />
+                  Player Color
+                </h3>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value={playerColor}
+                    onChange={(e) => setPlayerColor(e.target.value)}
+                    className="w-10 h-10 rounded-lg cursor-pointer border-2 border-border p-0.5"
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium">{playerColor}</span>
+                    <span className="text-xs text-muted-foreground">Play button and waveform bars</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -910,7 +949,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
           <div className="card-playful p-6 border-primary/20">
             <h2 className="text-xl font-bold text-foreground flex items-center gap-2 mb-6">
               <Eye className="w-5 h-5 text-primary" />
-              Canlı Önizleme
+              Live Preview
             </h2>
 
             {/* Preview container */}
@@ -1027,16 +1066,16 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
           <div className="card-playful p-6 border-primary/20">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-foreground">
-                📋 Embed Kodu
+                📋 Embed Code
               </h2>
               <div className="flex gap-2">
                 <Button onClick={saveAsFile} variant="outline" className="rounded-xl">
                   <Download className="w-4 h-4 mr-2" />
-                  Kaydet
+                  Save
                 </Button>
                 <Button onClick={copyToClipboard} className="btn-playful bg-emerald-500 hover:bg-emerald-500/90 text-white">
                   {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
-                  {copied ? "Kopyalandı!" : "Kopyala"}
+                  {copied ? "Copied!" : "Copy"}
                 </Button>
               </div>
             </div>
@@ -1046,7 +1085,7 @@ Gizlenecek kelimeleri parantez içine alın: (kelime)`}
             </pre>
 
             <div className="mt-4 p-3 bg-primary/10 border border-primary/30 rounded-xl text-sm text-muted-foreground">
-              📏 Kod boyutu: <strong>{codeSize.bytes} bayt</strong> ({codeSize.kb} KB)
+              📏 Code size: <strong>{codeSize.bytes} bytes</strong> ({codeSize.kb} KB)
             </div>
           </div>
         </TabsContent>

@@ -618,3 +618,213 @@
         margin: 1.5cm;
     }
 }
+
+/* ============================================
+   CUSTOM AUDIO PLAYER - Waveform Bar Styles
+   ============================================ */
+
+.lw-audio-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #e2e8f0;
+    z-index: 9000;
+}
+
+.lw-audio-player-content {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: space-between;
+}
+
+.lw-play-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--lw-player-color, #f97316);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--lw-player-color, #f97316) 35%, transparent);
+    transition: transform 0.2s, background 0.2s, filter 0.2s;
+    flex-shrink: 0;
+}
+
+.lw-play-btn:hover {
+    transform: scale(1.08);
+    filter: brightness(0.9);
+}
+
+.lw-play-btn svg {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
+}
+
+/* Track Info (next to play button) */
+.lw-track-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 100px;
+    max-width: 200px;
+}
+
+.lw-track-status {
+    font-size: 1.5rem;
+    color: var(--lw-player-color, #f97316);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--lw-font-family, sans-serif);
+}
+
+.lw-track-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #334155;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: var(--lw-font-family, sans-serif);
+}
+
+/* Waveform Bars Container */
+.lw-wave-container {
+    flex: 1;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    position: relative;
+    cursor: pointer;
+    min-width: 150px;
+}
+
+.lw-wave-bar {
+    width: 5px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    height: 40%;
+    transition: height 0.15s ease, background-color 0.1s ease;
+}
+
+.lw-wave-bar.active {
+    background: var(--lw-player-color, #f97316);
+}
+
+.lw-wave-bar.animate {
+    animation: lwSoundWave 1.2s ease-in-out infinite;
+}
+
+@keyframes lwSoundWave {
+
+    0%,
+    100% {
+        height: 35%;
+    }
+
+    50% {
+        height: 100%;
+    }
+}
+
+/* Overlay Range Input for Seeking */
+.lw-seek-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+    margin: 0;
+}
+
+/* Time Display */
+.lw-time-display {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #334155;
+    min-width: 50px;
+    text-align: right;
+    font-family: var(--lw-font-family);
+}
+
+/* Hidden Iframes Container */
+.lw-sc-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    left: -9999px;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+/* Mode Switch */
+.lw-mode-switch {
+    display: flex;
+    align-items: center;
+    background: #f1f5f9;
+    border-radius: 12px;
+    padding: 4px;
+    flex-shrink: 0;
+}
+
+.lw-mode-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-weight: 700;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--lw-font-family);
+}
+
+.lw-mode-btn:hover {
+    color: #475569;
+}
+
+.lw-mode-btn.active {
+    background: white;
+    color: var(--lw-player-color, #f97316);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.lw-mode-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+}
+
+/* Print: Hide audio player */
+@media print {
+
+    .lw-audio-player,
+    .lw-sc-hidden {
+        display: none !important;
+    }
+}

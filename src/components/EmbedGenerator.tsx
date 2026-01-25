@@ -250,12 +250,11 @@ ${cards.map(c => `        <div style="border:4px solid ${borderColor};border-rad
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gradient mb-3">
-            🎨 LearnWorlds Embed Generator
+          <h1 className="text-4xl md:text-5xl font-extrabold text-slate-700 mb-3">
+            🎨 SoundsForFreedom Flashcards
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Create kid-friendly flashcard embed codes. Edit images and texts,
-            preview and copy with a single click!
+
           </p>
         </header>
 
@@ -300,7 +299,7 @@ ${cards.map(c => `        <div style="border:4px solid ${borderColor};border-rad
                     {isLoadingFilenames ? (
                       <>
                         <span className="animate-spin mr-2">⏳</span>
-                        Dosya adları alınıyor...
+                        Fetching filenames...
                       </>
                     ) : (
                       <>

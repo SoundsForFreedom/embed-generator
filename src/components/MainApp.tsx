@@ -17,8 +17,8 @@ const MainApp = () => {
             <button
               onClick={() => setMode("flashcards")}
               className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${mode === "flashcards"
-                  ? "bg-primary text-primary-foreground shadow-lg scale-105"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
             >
               <Layers className="w-5 h-5" />
@@ -27,8 +27,8 @@ const MainApp = () => {
             <button
               onClick={() => setMode("gaten-tekst")}
               className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${mode === "gaten-tekst"
-                  ? "bg-primary text-primary-foreground shadow-lg scale-105"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
             >
               <FileText className="w-5 h-5" />
@@ -46,12 +46,11 @@ const MainApp = () => {
           <div className="max-w-7xl mx-auto">
             {/* Header */}
             <header className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-gradient mb-3">
-                🎵 Gaten tekst Generator
+              <h1 className="text-4xl md:text-5xl font-extrabold text-slate-700 mb-3">
+                🎵 SoundsForFreedom Gaten tekst
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Create fill-in-the-blank embed codes with SoundCloud integration.
-                Put words in parentheses to hide them!
+
               </p>
             </header>
 
