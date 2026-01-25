@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Müzik Eğitimi Player - Senkronize Şarkı Sözleri">
+    <title>Müzik Eğitimi Player</title>
+
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <style>
+        /* ============================================
+           CSS VARIABLES - Kolay özelleştirme için
+           ============================================ */
+        :root {
+            /* Renkler */
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --accent-color: #fbbf24;
+            --accent-glow: rgba(251, 191, 36, 0.6);
+            --success-color: #10b981;
+            --background-color: #0f172a;
+            --surface-color: #1e293b;
+            --surface-light: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --text-inactive: #475569;
+
+            /* Animasyon */
+            --transition-fast: 0.15s;
+            --transition-normal: 0.3s;
+
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ============================================
+           MAIN CONTAINER
+           ============================================ */
+        .player-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        /* ============================================
+           VIDEO SECTION
+           ============================================ */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-wrapper video {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+
+        /* ============================================
+           CUE DISPLAY AREA - Görünür animasyon alanı
+           ============================================ */
+        .cue-display-area {
+            background: linear-gradient(135deg, var(--surface-color), var(--surface-light));
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .cue-display-area::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, var(--surface-color) 70%);
+            pointer-events: none;
+        }
+
+        .cue-label {
+            position: absolute;
+            top: var(--spacing-sm);
+            left: var(--spacing-md);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .cue-content {
+            position: relative;
+            z-index: 1;
+            font-size: 4rem;
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .cue-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Cue türleri için renkler */
+        .cue-clap {
+            color: #fbbf24;
+            text-shadow: 0 0 30px rgba(251, 191, 36, 0.8);
+        }
+
+        .cue-beat {
+            color: #ef4444;
+            text-shadow: 0 0 30px rgba(239, 68, 68, 0.8);
+        }
+
+        .cue-star {
+            color: #a855f7;
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
+        }
+
+        .cue-heart {
+            color: #ec4899;
+            text-shadow: 0 0 30px rgba(236, 72, 153, 0.8);
+        }
+
+        .cue-music {
+            color: #22d3ee;
+            text-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
+        }
+
+        /* Ripple efekti */
+        .cue-ripple {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid currentColor;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ============================================
+           LYRICS SECTION - Karaoke Stili
+           ============================================ */
+        .lyrics-container {
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            overflow-y: auto;
+            max-height: 350px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Gradient overlays */
+        .lyrics-container::before,
+        .lyrics-container::after {
+            content: '';
+            position: sticky;
+            display: block;
+            left: 0;
+            right: 0;
+            height: 40px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .lyrics-container::before {
+            top: 0;
+            background: linear-gradient(to bottom, var(--surface-color), transparent);
+            margin-bottom: -40px;
+        }
+
+        .lyrics-container::after {
+            bottom: 0;
+            background: linear-gradient(to top, var(--surface-color), transparent);
+            margin-top: -40px;
+        }
+
+        .lyrics-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Lyrics satır */
+        .lyrics-line {
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin: var(--spacing-sm) 0;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background var(--transition-normal) ease;
+            position: relative;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            min-height: 3rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.3em;
+        }
+
+        .lyrics-line:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Aktif satır arka planı */
+        .lyrics-line.active {
+            background: linear-gradient(135deg,
+                    rgba(99, 102, 241, 0.15),
+                    rgba(139, 92, 246, 0.1));
+            border-left: 3px solid var(--primary-color);
+        }
+
+        /* ============================================
+           WORD STYLING - Kelime Bazlı Karaoke
+           ============================================ */
+        .lyrics-word {
+            display: inline-block;
+            position: relative;
+            color: var(--text-inactive);
+            transition: color var(--transition-fast) ease;
+            padding: 0.1em 0;
+            font-weight: 400;
+        }
+
+        /* Kelime geçmiş (söylenmiş) */
+        .lyrics-word.passed {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        /* Kelime aktif (şu an söyleniyor) */
+        .lyrics-word.active {
+            color: #fff;
+            font-weight: 600;
+            transform: scale(1.05);
+        }
+
+        /* Aktif kelime alt çizgi animasyonu */
+        .lyrics-word.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent-glow);
+            animation: wordPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes wordPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scaleX(0.95);
+            }
+        }
+
+        /* Kelime glow efekti */
+        .lyrics-word.active .word-glow {
+            position: absolute;
+            inset: -5px -8px;
+            background: radial-gradient(ellipse, var(--accent-glow), transparent 70%);
+            border-radius: 4px;
+            z-index: -1;
+            animation: glowFade 0.3s ease-out;
+        }
+
+        @keyframes glowFade {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* ============================================
+           PROGRESS INDICATOR
+           ============================================ */
+        .global-progress {
+            height: 4px;
+            background: var(--surface-light);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: var(--spacing-sm);
+        }
+
+        .global-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* ============================================
+           CONTROLS
+           ============================================ */
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--surface-light);
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all var(--transition-fast) ease;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .control-btn:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .control-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-light);
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 768px) {
+            .player-container {
+                padding: var(--spacing-sm);
+                gap: var(--spacing-md);
+            }
+
+            .lyrics-container {
+                padding: var(--spacing-md);
+                max-height: 280px;
+            }
+
+            .lyrics-line {
+                font-size: 1rem;
+                padding: var(--spacing-sm) var(--spacing-md);
+            }
+
+            .cue-display-area {
+                min-height: 100px;
+                padding: var(--spacing-md);
+            }
+
+            .cue-content {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .lyrics-line {
+                font-size: 0.95rem;
+            }
+
+            .cue-content {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* ============================================
+           IFRAME UYUMLULUK
+           ============================================ */
+        body.in-iframe {
+            background: transparent;
+        }
+
+        body.in-iframe .player-container {
+            max-width: 100%;
+            padding: var(--spacing-sm);
+        }
+
+        /* ============================================
+           ACCESSIBILITY
+           ============================================ */
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .lyrics-line:focus-visible,
+        .control-btn:focus-visible {
+            outline: 2px solid var(--primary-light);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Ana Player Container -->
+    <div class="player-container">
+
+        <!-- Video Bölümü -->
+        <div class="video-wrapper">
+            <video id="mainVideo" controls playsinline preload="metadata">
+                <source src="dieren.mp3" type="audio/mp3">
+                Tarayıcınız video etiketini desteklemiyor.
+            </video>
+        </div>
+
+        <!-- Cue Animasyon Alanı - Görünür -->
+        <div class="cue-display-area" id="cueDisplayArea">
+            <span class="cue-label">🎯 Görsel İşaret</span>
+            <div class="cue-content" id="cueContent"></div>
+            <div class="cue-text" id="cueText">Video oynatıldığında işaretler burada görünecek</div>
+            <!-- Ripple efektleri dinamik olarak eklenir -->
+        </div>
+
+        <!-- Lyrics Bölümü -->
+        <div class="lyrics-container" id="lyricsContainer">
+            <div class="lyrics-content" id="lyricsContent">
+                <!-- Lyrics satırları JavaScript ile oluşturulur -->
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="global-progress">
+            <div class="global-progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- Kontrol Butonları -->
+        <div class="player-controls">
+            <button class="control-btn active" id="autoScrollBtn" onclick="toggleAutoScroll()">
+                <span>📜</span> Otomatik Kaydırma
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================
+           LYRICS DATA - JSON Tabanlı Şarkı Sözleri
+           ============================================
+           Her satır için kelime bazlı zamanlama zorunlu!
+           - start/end: Satırın toplam süresi
+           - words: Her kelimenin start/end zamanı
+           - cue: Opsiyonel görsel işaret
+        */
+        /**
+         * Hollandaca Şarkı: "We zingen en springen"
+         * Thema 01 Dieren - onderbouw - Les 1 In de kring - klankoefening
+         * Toplam süre: ~21 saniye
+         */
+        const LYRICS_DATA = [
+            // === KUPLE 1 ===
+            {
+                start: 0.95,
+                end: 5.2,
+                cue: { type: "music", text: "🎵 We gaan zingen!" },
+                words: [
+                    { text: "We", start: 0.95, end: 1.25 },
+                    { text: "zingen", start: 1.25, end: 1.85 },
+                    { text: "en", start: 1.85, end: 2.15 },
+                    { text: "springen", start: 2.15, end: 2.95 },
+                    { text: "en", start: 2.95, end: 3.25 },
+                    { text: "slingen", start: 3.25, end: 4.05 },
+                    { text: "in", start: 4.05, end: 4.35 },
+                    { text: "een", start: 4.35, end: 4.65 },
+                    { text: "kring,", start: 4.65, end: 5.2 }
+                ]
+            },
+            {
+                start: 5.2,
+                end: 9.77,
+                cue: { type: "star", text: "⭐ Zing door je ding!" },
+                words: [
+                    { text: "zingen", start: 5.2, end: 5.9 },
+                    { text: "door", start: 5.9, end: 6.5 },
+                    { text: "je", start: 6.5, end: 6.9 },
+                    { text: "ding.", start: 6.9, end: 9.77 }
+                ]
+            },
+            // === KUPLE 2 ===
+            {
+                start: 10.93,
+                end: 15.1,
+                cue: { type: "clap", text: "👏 Nog een keer!" },
+                words: [
+                    { text: "We", start: 10.93, end: 11.23 },
+                    { text: "zingen", start: 11.23, end: 11.83 },
+                    { text: "en", start: 11.83, end: 12.13 },
+                    { text: "springen", start: 12.13, end: 12.93 },
+                    { text: "en", start: 12.93, end: 13.23 },
+                    { text: "slingen", start: 13.23, end: 14.03 },
+                    { text: "in", start: 14.03, end: 14.33 },
+                    { text: "een", start: 14.33, end: 14.63 },
+                    { text: "kring,", start: 14.63, end: 15.1 }
+                ]
+            },
+            {
+                start: 15.1,
+                end: 18.05,
+                cue: { type: "heart", text: "❤️ Geweldig!" },
+                words: [
+                    { text: "zingen", start: 15.1, end: 15.8 },
+                    { text: "door", start: 15.8, end: 16.4 },
+                    { text: "je", start: 16.4, end: 16.8 },
+                    { text: "ding.", start: 16.8, end: 18.05 }
+                ]
+            }
+        ];
+
+        // Cue icon haritası
+        const CUE_ICONS = {
+            clap: "👏",
+            beat: "💓",
+            star: "⭐",
+            heart: "❤️",
+            music: "🎵"
+        };
+
+        /* ============================================
+           STATE MANAGEMENT
+           ============================================ */
+        let autoScroll = true;
+        let currentLineIndex = -1;
+        let lastCueTime = -1;
+
+        /* ============================================
+           DOM ELEMENTS
+           ============================================ */
+        const video = document.getElementById('mainVideo');
+        const lyricsContent = document.getElementById('lyricsContent');
+        const lyricsContainer = document.getElementById('lyricsContainer');
+        const progressBar = document.getElementById('progressBar');
+        const cueDisplayArea = document.getElementById('cueDisplayArea');
+        const cueContent = document.getElementById('cueContent');
+        const cueText = document.getElementById('cueText');
+
+        /* ============================================
+           INITIALIZATION
+           ============================================ */
+        document.addEventListener('DOMContentLoaded', () => {
+            checkIfInIframe();
+            renderLyrics();
+            setupVideoListeners();
+        });
+
+        function checkIfInIframe() {
+            try {
+                if (window.self !== window.top) {
+                    document.body.classList.add('in-iframe');
+                }
+            } catch (e) {
+                document.body.classList.add('in-iframe');
+            }
+        }
+
+        /**
+         * Lyrics satırlarını DOM'a render et
+         * Her kelime ayrı span olarak oluşturulur
+         */
+        function renderLyrics() {
+            lyricsContent.innerHTML = '';
+
+            LYRICS_DATA.forEach((line, lineIndex) => {
+                const lineEl = document.createElement('div');
+                lineEl.className = 'lyrics-line';
+                lineEl.setAttribute('data-line-index', lineIndex);
+                lineEl.setAttribute('tabindex', '0');
+
+                // Her kelimeyi ayrı span olarak ekle
+                line.words.forEach((word, wordIndex) => {
+                    const wordEl = document.createElement('span');
+                    wordEl.className = 'lyrics-word';
+                    wordEl.textContent = word.text;
+                    wordEl.setAttribute('data-word-index', wordIndex);
+                    wordEl.setAttribute('data-start', word.start);
+                    wordEl.setAttribute('data-end', word.end);
+                    lineEl.appendChild(wordEl);
+                });
+
+                // Satıra tıklayınca o zamana git
+                lineEl.addEventListener('click', () => {
+                    video.currentTime = line.start;
+                    if (video.paused) video.play();
+                });
+
+                lyricsContent.appendChild(lineEl);
+            });
+        }
+
+        function setupVideoListeners() {
+            video.addEventListener('timeupdate', handleTimeUpdate);
+            video.addEventListener('seeked', () => handleTimeUpdate());
+            video.addEventListener('ended', resetState);
+        }
+
+        /* ============================================
+           TIME UPDATE - Ana senkronizasyon mantığı
+           ============================================ */
+        function handleTimeUpdate() {
+            const currentTime = video.currentTime;
+
+            updateProgress(currentTime);
+            updateLyrics(currentTime);
+        }
+
+        function updateProgress(currentTime) {
+            const duration = video.duration || 1;
+            const percent = (currentTime / duration) * 100;
+            progressBar.style.width = `${percent}%`;
+        }
+
+        /**
+         * Lyrics güncelleme - Kelime bazlı senkron
+         */
+        function updateLyrics(currentTime) {
+            const lines = lyricsContent.querySelectorAll('.lyrics-line');
+
+            LYRICS_DATA.forEach((lineData, lineIndex) => {
+                const lineEl = lines[lineIndex];
+                const words = lineEl.querySelectorAll('.lyrics-word');
+                const isLineActive = currentTime >= lineData.start && currentTime < lineData.end;
+
+                // Satır aktiflik durumu
+                if (isLineActive) {
+                    if (currentLineIndex !== lineIndex) {
+                        // Yeni satıra geçiş
+                        lines.forEach(l => l.classList.remove('active'));
+                        lineEl.classList.add('active');
+                        currentLineIndex = lineIndex;
+
+                        // Satır animasyonu
+                        gsap.fromTo(lineEl,
+                            { x: -20, opacity: 0.5 },
+                            { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
+                        );
+
+                        // Cue tetikleme
+                        if (lineData.cue && lineData.start !== lastCueTime) {
+                            lastCueTime = lineData.start;
+                            triggerCue(lineData.cue);
+                        }
+
+                        // Otomatik kaydırma
+                        if (autoScroll) {
+                            lineEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+
+                    // Kelime bazlı güncelleme
+                    lineData.words.forEach((wordData, wordIndex) => {
+                        const wordEl = words[wordIndex];
+                        const isWordActive = currentTime >= wordData.start && currentTime < wordData.end;
+                        const isWordPassed = currentTime >= wordData.end;
+
+                        if (isWordPassed && !wordEl.classList.contains('passed')) {
+                            wordEl.classList.remove('active');
+                            wordEl.classList.add('passed');
+                            // Glow efektini kaldır
+                            const glow = wordEl.querySelector('.word-glow');
+                            if (glow) glow.remove();
+                        }
+
+                        if (isWordActive && !wordEl.classList.contains('active')) {
+                            wordEl.classList.remove('passed');
+                            wordEl.classList.add('active');
+
+                            // Glow efekti ekle
+                            if (!wordEl.querySelector('.word-glow')) {
+                                const glow = document.createElement('span');
+                                glow.className = 'word-glow';
+                                wordEl.appendChild(glow);
+                            }
+
+                            // Kelime animasyonu
+                            gsap.fromTo(wordEl,
+                                { scale: 0.9, y: 3 },
+                                {
+                                    scale: 1.05,
+                                    y: 0,
+                                    duration: 0.2,
+                                    ease: "back.out(2)"
+                                }
+                            );
+                        }
+                    });
+                } else if (currentTime < lineData.start) {
+                    // Satır henüz gelmedi - tüm kelimeleri sıfırla
+                    words.forEach(w => {
+                        w.classList.remove('active', 'passed');
+                        const glow = w.querySelector('.word-glow');
+                        if (glow) glow.remove();
+                    });
+                    lineEl.classList.remove('active');
+                } else if (currentTime >= lineData.end) {
+                    // Satır geçti - tüm kelimeler passed
+                    words.forEach(w => {
+                        w.classList.remove('active');
+                        w.classList.add('passed');
+                        const glow = w.querySelector('.word-glow');
+                        if (glow) glow.remove();
+                    });
+                    lineEl.classList.remove('active');
+                }
+            });
+        }
+
+        /* ============================================
+           CUE ANIMATIONS - Profesyonel görsel efektler
+           ============================================ */
+        function triggerCue(cue) {
+            const icon = CUE_ICONS[cue.type] || "✨";
+
+            // Önceki animasyonları temizle
+            gsap.killTweensOf(cueContent);
+            gsap.killTweensOf(cueDisplayArea);
+
+            // İçeriği ayarla
+            cueContent.textContent = icon;
+            cueContent.className = `cue-content cue-${cue.type}`;
+            cueText.textContent = cue.text || '';
+            cueText.style.opacity = '1';
+
+            // Ana animasyon timeline
+            const tl = gsap.timeline();
+
+            // Giriş animasyonu
+            tl.set(cueContent, { opacity: 0, scale: 0, rotation: -180 })
+                .to(cueContent, {
+                    opacity: 1,
+                    scale: 1.2,
+                    rotation: 0,
+                    duration: 0.4,
+                    ease: "back.out(3)"
+                })
+                .to(cueContent, {
+                    scale: 1,
+                    duration: 0.15,
+                    ease: "power2.out"
+                });
+
+            // Cue türüne göre özel efektler
+            switch (cue.type) {
+                case 'clap':
+                    // Alkış - çoklu ripple ve shake
+                    createRipples(3, '#fbbf24');
+                    gsap.to(cueDisplayArea, {
+                        x: 8,
+                        duration: 0.05,
+                        yoyo: true,
+                        repeat: 5,
+                        ease: "power2.inOut"
+                    });
+                    // Çift el efekti
+                    tl.to(cueContent, {
+                        scale: 1.3,
+                        duration: 0.1,
+                        yoyo: true,
+                        repeat: 2
+                    }, "-=0.3");
+                    break;
+
+                case 'beat':
+                    // Kalp atışı - nabız efekti
+                    createRipples(2, '#ef4444');
+                    tl.to(cueContent, {
+                        scale: 1.4,
+                        duration: 0.15,
+                        ease: "power2.out",
+                        yoyo: true,
+                        repeat: 3
+                    }, "-=0.2");
+                    // Arka plan pulse
+                    gsap.to(cueDisplayArea, {
+                        boxShadow: "inset 0 0 60px rgba(239, 68, 68, 0.4)",
+                        duration: 0.2,
+                        yoyo: true,
+                        repeat: 2
+                    });
+                    break;
+
+                case 'star':
+                    // Yıldız - döndürme ve parıltı
+                    createRipples(4, '#a855f7');
+                    tl.to(cueContent, {
+                        rotation: 360,
+                        scale: 1.2,
+                        duration: 0.6,
+                        ease: "power1.out"
+                    }, "-=0.4");
+                    // Parıltı efekti
+                    gsap.to(cueDisplayArea, {
+                        background: "linear-gradient(135deg, rgba(168, 85, 247, 0.2), var(--surface-color))",
+                        duration: 0.3,
+                        yoyo: true,
+                        repeat: 1
+                    });
+                    break;
+
+                case 'heart':
+                    // Kalp - büyüyüp küçülme
+                    createRipples(3, '#ec4899');
+                    tl.to(cueContent, {
+                        scale: 1.5,
+                        duration: 0.2,
+                        ease: "elastic.out(1, 0.5)"
+                    }, "-=0.3")
+                        .to(cueContent, {
+                            scale: 1,
+                            duration: 0.3
+                        });
+                    break;
+
+                case 'music':
+                    // Müzik - sallanma
+                    createRipples(2, '#22d3ee');
+                    tl.to(cueContent, {
+                        rotation: 15,
+                        duration: 0.1,
+                        yoyo: true,
+                        repeat: 5,
+                        ease: "sine.inOut"
+                    }, "-=0.3");
+                    break;
+            }
+
+            // Çıkış animasyonu
+            tl.to(cueContent, {
+                opacity: 0,
+                scale: 0.5,
+                y: -30,
+                duration: 0.5,
+                delay: 0.8,
+                ease: "power2.in"
+            })
+                .to(cueText, {
+                    opacity: 0,
+                    duration: 0.3
+                }, "-=0.3");
+        }
+
+        /**
+         * Ripple efektleri oluştur
+         */
+        function createRipples(count, color) {
+            for (let i = 0; i < count; i++) {
+                const ripple = document.createElement('div');
+                ripple.className = 'cue-ripple';
+                ripple.style.borderColor = color;
+                cueDisplayArea.appendChild(ripple);
+
+                gsap.fromTo(ripple,
+                    {
+                        opacity: 0.8,
+                        scale: 0.5,
+                        left: '50%',
+                        top: '50%',
+                        x: '-50%',
+                        y: '-50%'
+                    },
+                    {
+                        opacity: 0,
+                        scale: 3,
+                        duration: 1,
+                        delay: i * 0.15,
+                        ease: "power2.out",
+                        onComplete: () => ripple.remove()
+                    }
+                );
+            }
+        }
+
+        /* ============================================
+           UTILITY FUNCTIONS
+           ============================================ */
+        function resetState() {
+            currentLineIndex = -1;
+            lastCueTime = -1;
+
+            const lines = lyricsContent.querySelectorAll('.lyrics-line');
+            lines.forEach(line => {
+                line.classList.remove('active');
+                line.querySelectorAll('.lyrics-word').forEach(word => {
+                    word.classList.remove('active', 'passed');
+                    const glow = word.querySelector('.word-glow');
+                    if (glow) glow.remove();
+                });
+            });
+        }
+
+        function toggleAutoScroll() {
+            autoScroll = !autoScroll;
+            const btn = document.getElementById('autoScrollBtn');
+            btn.classList.toggle('active', autoScroll);
+
+            gsap.fromTo(btn,
+                { scale: 1 },
+                { scale: 1.1, duration: 0.1, yoyo: true, repeat: 1 }
+            );
+        }
+
+        /* ============================================
+           PUBLIC API
+           ============================================ */
+        window.MusicPlayer = {
+            updateLyrics: function (newLyrics) {
+                LYRICS_DATA.length = 0;
+                LYRICS_DATA.push(...newLyrics);
+                renderLyrics();
+                resetState();
+            },
+            updateVideoSource: function (src, type = 'video/mp4') {
+                video.querySelector('source').src = src;
+                video.load();
+            },
+            play: () => video.play(),
+            pause: () => video.pause(),
+            seek: (time) => { video.currentTime = time; }
+        };
+    </script>
+</body>
+
+</html>

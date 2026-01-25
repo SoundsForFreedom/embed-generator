@@ -1,0 +1,392 @@
+/**
+ * LearnWorlds Audio-Text Embed Component
+ * Styles for lyrics display with SoundCloud integration
+ * 
+ * Version: 2.0.0 - Multi-page print support
+ * -------------------------------------------
+ */
+
+/* Reset and main container */
+.lw-main {
+    all: initial;
+    display: block;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    width: 100%;
+    padding-bottom: 180px;
+    box-sizing: border-box;
+    background: #fff;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Header section */
+.lw-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 2rem 2rem 1rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.lw-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.lw-author {
+    font-size: 1.8rem;
+    color: #333;
+    font-weight: 400;
+}
+
+/* Content area */
+.lw-content {
+    padding: 1rem 2rem 2rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    font-size: 2.5rem;
+    line-height: 1.5;
+    color: #333;
+    position: relative;
+    z-index: 1;
+}
+
+.lw-content p {
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.lw-content p.active {
+    background: #f0f9ff;
+    border-left: 4px solid #2563eb;
+    padding-left: 1rem;
+}
+
+/* Paragraph wrapper - for inline buttons */
+.lw-para-wrap {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.lw-para-wrap p {
+    flex: 1;
+    cursor: pointer;
+}
+
+/* Inline buttons */
+.lw-inline-btns {
+    display: none;
+    flex-direction: column;
+    gap: 0.3rem;
+    position: absolute;
+    right: -70px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.lw-para-wrap.selected .lw-inline-btns {
+    display: flex;
+}
+
+.lw-inline-btn {
+    all: initial;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 36px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.lw-inline-btn:hover {
+    transform: scale(1.05);
+}
+
+.lw-inline-btn.show {
+    background: #10b981;
+}
+
+/* Bottom control bar */
+.lw-bar {
+    position: fixed;
+    bottom: 80px;
+    left: 0;
+    width: 100%;
+    background: #fafafa;
+    border-top: 1px solid #e5e7eb;
+    z-index: 9998;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+    padding: 0.75rem 1rem;
+}
+
+.lw-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.lw-btn {
+    all: initial;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-family: inherit;
+    font-size: 1.7rem;
+    font-weight: 600;
+    background: #4a5568;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.lw-btn:hover {
+    background: #2d3748;
+}
+
+.lw-btn.nav {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.lw-btn.nav:hover {
+    background: #d1d5db;
+}
+
+.lw-btn.tog {
+    background: #dc2626;
+    min-width: 100px;
+}
+
+.lw-btn.tog:hover {
+    background: #b91c1c;
+}
+
+.lw-btn.tog.on {
+    background: #10b981;
+}
+
+.lw-btn.tog.on:hover {
+    background: #059669;
+}
+
+.lw-btn.pr {
+    background: #2563eb;
+}
+
+.lw-btn.pr:hover {
+    background: #1d4ed8;
+}
+
+.lw-ind {
+    font-size: 1.8rem;
+    color: #000000;
+    min-width: 70px;
+    text-align: center;
+}
+
+.lw-div {
+    width: 1px;
+    height: 30px;
+    background: #d1d5db;
+}
+
+/* Hidden words styling */
+.lw-word {
+    padding: 2px 0;
+    font-weight: 500;
+    color: #268ceb;
+    display: inline-block;
+    text-align: center;
+}
+
+.lw-word.hide {
+    color: transparent;
+    position: relative;
+}
+
+.lw-word.hide::after {
+    content: '.....';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #dc2626;
+}
+
+/* Audio player container */
+.lw-audio {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: #fff;
+    border-top: 2px solid #e5e7eb;
+    z-index: 9999;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.lw-audio iframe {
+    width: 100%;
+    height: 80px;
+    border: none;
+}
+
+/* ===========================================
+   PRINT STYLES - Multi-page support
+   =========================================== */
+@media print {
+    /* Hide UI elements */
+    .lw-bar,
+    .lw-audio,
+    .lw-inline-btns {
+        display: none !important;
+    }
+
+    /* Reset main container for printing */
+    .lw-main {
+        padding-bottom: 0 !important;
+        overflow: visible !important;
+        background: #fff !important;
+        position: static !important;
+    }
+
+    /* Header styling for print */
+    .lw-header {
+        padding: 0 0 1rem 0;
+        max-width: 100%;
+        page-break-after: avoid;
+        border-bottom: 2px solid #333;
+        margin-bottom: 1.5rem;
+    }
+
+    .lw-title {
+        font-size: 24pt;
+        color: #000;
+    }
+
+    .lw-author {
+        font-size: 14pt;
+        color: #333;
+    }
+
+    /* Content area for print */
+    .lw-content {
+        font-size: 12pt;
+        line-height: 1.8;
+        padding: 0;
+        max-width: 100%;
+        overflow: visible !important;
+    }
+
+    /* Paragraph styling for print */
+    .lw-content p {
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        /* CRITICAL: Prevent paragraphs from being split across pages */
+        page-break-inside: avoid;
+        break-inside: avoid;
+        /* Allow page breaks after paragraphs if needed */
+        page-break-after: auto;
+        break-after: auto;
+    }
+
+    /* Paragraph wrapper for print */
+    .lw-para-wrap {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        display: block;
+    }
+
+    /* Remove active state styling in print */
+    .lw-content p.active {
+        background: none !important;
+        border-left: none !important;
+        padding-left: 0.5rem !important;
+    }
+
+    /* Word styling for print */
+    .lw-word {
+        color: #000 !important;
+        font-weight: 600;
+    }
+
+    /* Hidden words in print - show as blanks with underline */
+    .lw-word.hide {
+        color: transparent !important;
+        background: none !important;
+        border-bottom: 2px solid #333;
+        min-width: 80px;
+        display: inline-block;
+    }
+
+    .lw-word.hide::after {
+        content: '' !important;
+        display: none !important;
+    }
+
+    /* Page settings */
+    @page {
+        size: A4;
+        margin: 2cm 1.5cm;
+    }
+
+    /* First page specific */
+    @page :first {
+        margin-top: 1.5cm;
+    }
+
+    /* Ensure body allows overflow */
+    body {
+        overflow: visible !important;
+        height: auto !important;
+    }
+
+    /* Force all content to be visible */
+    html, body, .lw-main, .lw-content {
+        height: auto !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+}
+
+/* Print preview adjustments */
+@media screen and (max-width: 768px) {
+    .lw-content {
+        font-size: 1.8rem;
+    }
+    
+    .lw-btn {
+        font-size: 1.2rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .lw-ind {
+        font-size: 1.4rem;
+    }
+}
