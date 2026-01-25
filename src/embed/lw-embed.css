@@ -282,27 +282,29 @@
 }
 
 /* Bottom control bar */
+/* Bottom control bar - Floating & Modern */
 .lw-bar {
     position: fixed;
-    bottom: 80px;
-    left: 0;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid #e5e7eb;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 100px;
     z-index: 9998;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-    padding: 0.75rem 1rem;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 0.5rem 0.8rem;
 }
 
 .lw-row {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    max-width: 900px;
-    margin: 0 auto;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
 }
 
 .lw-btn {
@@ -312,61 +314,75 @@
     justify-content: center;
     padding: 0.5rem 1rem;
     font-family: inherit;
-    font-size: 1.7rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    background: #4a5568;
-    color: #fff;
+    background: transparent;
+    color: #475569;
     border: none;
-    border-radius: 8px;
+    border-radius: 20px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .lw-btn:hover {
-    background: #2d3748;
+    background: rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
 }
 
 .lw-btn.nav {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     padding: 0;
-    background: #e5e7eb;
-    color: #374151;
+    border-radius: 50%;
+    background: #f1f5f9;
 }
 
 .lw-btn.nav:hover {
-    background: #d1d5db;
+    background: #cbd5e1;
 }
 
 .lw-btn.tog {
-    background: #dc2626;
-    min-width: 100px;
+    background: #fee2e2;
+    /* Soft red default */
+    color: #991b1b;
+    min-width: 80px;
 }
 
 .lw-btn.tog:hover {
-    background: #b91c1c;
+    background: #fecaca;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
 }
 
 .lw-btn.tog.on {
-    background: #10b981;
+    background: #d1fae5;
+    /* Soft green */
+    color: #065f46;
 }
 
 .lw-btn.tog.on:hover {
-    background: #059669;
+    background: #a7f3d0;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
 }
 
 .lw-btn.pr {
-    background: #2563eb;
+    background: transparent;
+    color: #475569;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
 }
 
 .lw-btn.pr:hover {
-    background: #1d4ed8;
+    background: #e0f2fe;
+    color: #0284c7;
 }
 
 .lw-ind {
-    font-size: 1.8rem;
-    color: #000000;
-    min-width: 70px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    min-width: 50px;
     text-align: center;
 }
 
