@@ -145,6 +145,7 @@ const GatenTekstGenerator = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [soundcloudEmbed, setSoundcloudEmbed] = useState("");
+  const [soundcloudEmbedInstrumental, setSoundcloudEmbedInstrumental] = useState("");
   const [lyrics, setLyrics] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -184,6 +185,7 @@ const GatenTekstGenerator = () => {
   const [useGlass, setUseGlass] = useState(true);
 
   const extractedUrl = useMemo(() => extractSoundCloudUrl(soundcloudEmbed), [soundcloudEmbed]);
+  const extractedUrlInstrumental = useMemo(() => extractSoundCloudUrl(soundcloudEmbedInstrumental), [soundcloudEmbedInstrumental]);
   const convertedImage1 = useMemo(() => convertGoogleDriveUrl(leftImageUrl1), [leftImageUrl1]);
   const convertedImage2 = useMemo(() => convertGoogleDriveUrl(leftImageUrl2), [leftImageUrl2]);
 
@@ -224,12 +226,22 @@ const GatenTekstGenerator = () => {
   const generatedCode = useMemo(() => {
     const displayTitle = title || "Title";
     const displayAuthor = author || "Author";
-    let soundCloudUrl = extractedUrl || "SOUNDCLOUD_URL_HERE";
 
+    // Process Vocal URL
+    let soundCloudUrl = extractedUrl || "SOUNDCLOUD_URL_HERE";
     if (soundCloudUrl !== "SOUNDCLOUD_URL_HERE") {
       soundCloudUrl = soundCloudUrl.replace(/visual=true/gi, "visual=false");
       if (!soundCloudUrl.includes("visual=")) {
         soundCloudUrl += (soundCloudUrl.includes("?") ? "&" : "?") + "visual=false";
+      }
+    }
+
+    // Process Instrumental URL
+    let soundCloudUrlInst = extractedUrlInstrumental || "";
+    if (soundCloudUrlInst) {
+      soundCloudUrlInst = soundCloudUrlInst.replace(/visual=true/gi, "visual=false");
+      if (!soundCloudUrlInst.includes("visual=")) {
+        soundCloudUrlInst += (soundCloudUrlInst.includes("?") ? "&" : "?") + "visual=false";
       }
     }
 
@@ -241,7 +253,7 @@ const GatenTekstGenerator = () => {
     const topLeftHtml = generateCornerHtml('topLeft', topLeftPattern, patternColor, patternOpacity[0], patternSize[0], patternMargin[0]);
     const bottomRightHtml = generateCornerHtml('bottomRight', bottomRightPattern, patternColor, patternOpacity[0], patternSize[0], patternMargin[0]);
 
-    // Generate images HTML - LEFT and RIGHT sides (FIXED position with custom size/margin)
+    // Generate images HTML
     const leftImageHtml = showImages && convertedImage1 ?
       `<div class="lw-side-image lw-left" style="left:${imageMargin[0]}px;">
         <img class="lw-character-image" style="max-width:${imageSize[0]}px;max-height:${imageSize[0]}px;" src="${convertedImage1}" alt="Character 1" onerror="this.style.display='none'"/>
@@ -268,6 +280,21 @@ const GatenTekstGenerator = () => {
   --lw-author-size: ${authorSize[0]}rem;
 }`;
 
+    // Toggle button html with SVGs and Text
+    // Initially hidden (display:none), JS will show it if both URLs exist
+    const toggleButtonHtml = `
+        <button class="lw-btn tog" id="btnAudioToggle" title="Mod Değiştir" style="display:none; min-width:160px; justify-content:center;">
+          <span class="icon-vocal" style="display:none; align-items:center; gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
+            <span>Vocal</span>
+          </span>
+          <span class="icon-inst" style="display:flex; align-items:center; gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="1" x2="23" y1="1" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94 0v5.8"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
+            <span>Instrumental</span>
+          </span>
+        </button>
+        <div class="lw-div"></div>`;
+
     return `<!-- ${escapeHtml(displayTitle)} - LearnWorlds Embed v3.0 -->
 <style data-lw-embed>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
@@ -276,7 +303,8 @@ ${inlineCss}
 </style>
 
 <script>
-var SOUNDCLOUD_URL = "${soundCloudUrl}";
+var SOUNDCLOUD_URL_VOCAL = "${soundCloudUrl}";
+var SOUNDCLOUD_URL_INSTRUMENTAL = "${soundCloudUrlInst}";
 var LIED_TITEL = "${escapeForJs(displayTitle)}";
 var LIED_AUTEUR = "${escapeForJs(displayAuthor)}";
 var TEKST_INHOUD = \`
@@ -286,11 +314,11 @@ ${textHtml}
 
 <!-- HTML Structure -->
 <div class="lw-wrapper" id="lw-wrapper">
-  <!-- Corner Decorations (FIXED) -->
+  <!-- Corner Decorations -->
   ${topLeftHtml}
   ${bottomRightHtml}
   
-  <!-- Character Images (FIXED) -->
+  <!-- Character Images -->
   ${leftImageHtml}
   ${rightImageHtml}
   
@@ -320,14 +348,21 @@ ${textHtml}
         <button class="lw-btn" id="btnToonAlles">Alles ▲</button>
         <div class="lw-div"></div>
         <button class="lw-btn pr icon-btn" id="btnAfdrukken" title="Yazdır">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
         </button>
+        <div class="lw-div"></div>
+        ${toggleButtonHtml}
       </div>
     </div>
 
-    <div class="lw-audio">
-      <iframe id="lw-sc" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${soundCloudUrl}"></iframe>
+    <!-- Dual Audio Containers -->
+    <div class="lw-audio" id="lw-audio-vocal">
+      <iframe id="lw-sc-vocal" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${soundCloudUrl}"></iframe>
     </div>
+    <div class="lw-audio" id="lw-audio-inst" style="display:none;">
+      <iframe id="lw-sc-inst" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay; encrypted-media" src="${soundCloudUrlInst}"></iframe>
+    </div>
+
   </div>
 
   <div class="lw-print-view" aria-hidden="true">
@@ -338,7 +373,7 @@ ${textHtml}
 <script data-lw-embed>
 ${inlineJs}
 <\/script>`;
-  }, [title, author, extractedUrl, lyrics, pageBgColor, topLeftPattern, bottomRightPattern,
+  }, [title, author, extractedUrl, extractedUrlInstrumental, lyrics, pageBgColor, topLeftPattern, bottomRightPattern,
     patternColor, patternOpacity, convertedImage1, convertedImage2, showImages, imageSize,
     fontFamily, fontSize, textColor, wordColor, placeholderColor, panelBgColor, useGlass]);
 
@@ -383,6 +418,7 @@ ${inlineJs}
     setTitle("");
     setAuthor("");
     setSoundcloudEmbed("");
+    setSoundcloudEmbedInstrumental("");
     setLyrics("");
     setLeftImageUrl1("");
     setLeftImageUrl2("");
@@ -454,6 +490,27 @@ ${inlineJs}
                       : 'bg-red-500/10 border border-red-500/30 text-red-600'
                       }`}>
                       {extractedUrl ? `✓ URL bulundu` : `✗ URL bulunamadı`}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <Label className="font-bold text-foreground mb-2 flex items-center gap-2">
+                    <Music className="w-4 h-4" />
+                    SoundCloud Enstrümantal (Opsiyonel)
+                  </Label>
+                  <Textarea
+                    value={soundcloudEmbedInstrumental}
+                    onChange={(e) => setSoundcloudEmbedInstrumental(e.target.value)}
+                    placeholder='Enstrümantal versiyon embed kodu...'
+                    className="input-playful font-mono text-sm min-h-[80px]"
+                  />
+                  {soundcloudEmbedInstrumental.trim() && (
+                    <div className={`mt-2 p-2 rounded-lg text-sm ${extractedUrlInstrumental
+                      ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-600'
+                      : 'bg-red-500/10 border border-red-500/30 text-red-600'
+                      }`}>
+                      {extractedUrlInstrumental ? `✓ URL bulundu` : `✗ URL bulunamadı`}
                     </div>
                   )}
                 </div>
