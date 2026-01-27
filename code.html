@@ -1,173 +1,355 @@
-<!DOCTYPE html>
-<html lang="nl"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Premium Child-Friendly Song Player Redesign</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;600;700;800&amp;family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
-<script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#15803d", // Deep green for primary accents
-                        secondary: "#fca5a5", // Blush
-                        accent: "#fde047", // Soft yellow
-                        sage: "#84a98c",
-                        ivory: "#fefae0",
-                        "background-light": "#dcfce7", // Very light green base
-                        "background-dark": "#111827", // Dark mode base
-                        "surface-light": "rgba(255, 255, 255, 0.75)",
-                        "surface-dark": "rgba(31, 41, 55, 0.8)",
-                    },
-                    fontFamily: {
-                        display: ["Fredoka", "cursive"], // Playful but clean headings
-                        body: ["Quicksand", "sans-serif"], // Readable, rounded body text
-                    },
-                    borderRadius: {
-                        DEFAULT: "1rem",
-                        'xl': '1.5rem',
-                        '2xl': '2rem',
-                        '3xl': '3rem',
-                    },
-                    boxShadow: {
-                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-                        'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
-                    }
-                },
-            },
-        };
-    </script>
-<style>.glass-panel {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+<!-- LearnWorlds Embed Code - Woordenlijst -->
+
+<style>
+    #lw-word-app {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        padding: 20px;
+        max-width: 900px;
+        margin: 0 auto
+    }
+
+    .lw-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 16px
+    }
+
+    .lw-theme-card {
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(124, 111, 234, .08);
+        border: 1px solid #e8e8f0;
+        transition: transform .2s, box-shadow .2s
+    }
+
+    .lw-theme-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(124, 111, 234, .12)
+    }
+
+    .lw-card-header {
+        padding: 14px 18px;
+        background: linear-gradient(135deg, #7c6fea, #a5a0f5)
+    }
+
+    .lw-card-header.lw-theme-2 {
+        background: linear-gradient(135deg, #6eb5d9, #8ec8e8)
+    }
+
+    .lw-card-title {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0
+    }
+
+    .lw-lesson-list {
+        list-style: none;
+        padding: 12px;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px
+    }
+
+    .lw-lesson-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: #f8f9fc;
+        border: 1px solid #e8e8f0;
+        border-radius: 10px;
+        padding: 12px 14px;
+        transition: all .15s
+    }
+
+    .lw-lesson-item:hover {
+        background: #eeedfb;
+        border-color: #a5a0f5;
+        transform: translateX(3px)
+    }
+
+    .lw-lesson-name {
+        font-weight: 500;
+        font-size: 13px;
+        color: #3d3d5c;
+        margin: 0
+    }
+
+    .lw-btn {
+        display: inline-flex;
+        align-items: center;
+        background: #7c6fea;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all .15s
+    }
+
+    .lw-btn:hover {
+        background: #6b5dd9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(124, 111, 234, .3)
+    }
+
+    .lw-modal-overlay {
+        display: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(30, 30, 50, .92) !important;
+        z-index: 2147483647 !important;
+        align-items: center;
+        justify-content: center;
+        padding: 16px
+    }
+
+    .lw-modal-overlay.lw-active {
+        display: flex !important
+    }
+
+    .lw-modal {
+        position: relative !important;
+        z-index: 2147483647 !important;
+        background: #fff;
+        width: 100%;
+        max-width: 420px;
+        border-radius: 18px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+        max-height: calc(100vh - 32px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden
+    }
+
+    .lw-modal-header {
+        background: linear-gradient(135deg, #7c6fea, #e8a0bf);
+        padding: 16px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center
+    }
+
+    .lw-modal-title {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0
+    }
+
+    .lw-close-btn {
+        background: rgba(255, 255, 255, .2);
+        border: none;
+        color: #fff;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .15s
+    }
+
+    .lw-close-btn:hover {
+        background: rgba(255, 255, 255, .3);
+        transform: rotate(90deg)
+    }
+
+    .lw-modal-body {
+        padding: 18px;
+        overflow-y: auto;
+        flex: 1
+    }
+
+    .lw-word-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px
+    }
+
+    .lw-word-list li {
+        background: #f8f9fc;
+        border: 1px solid #e8e8f0;
+        border-radius: 10px;
+        padding: 14px 10px;
+        text-align: center;
+        font-weight: 600;
+        color: #3d3d5c;
+        font-size: 14px;
+        transition: all .15s
+    }
+
+    .lw-word-list li:hover {
+        background: #eeedfb;
+        border-color: #a5a0f5;
+        transform: translateY(-2px)
+    }
+
+    .lw-modal-footer {
+        padding: 14px 18px;
+        border-top: 1px solid #e8e8f0;
+        display: flex;
+        justify-content: flex-end;
+        background: #f8f9fc
+    }
+
+    .lw-btn-copy {
+        background: #6eb5d9
+    }
+
+    .lw-btn-copy:hover {
+        background: #5ca8cf;
+        box-shadow: 0 4px 12px rgba(110, 181, 217, .35)
+    }
+
+    @media(max-width:600px) {
+        #lw-word-app {
+            padding: 14px
         }
-        .dark .glass-panel {
-            border: 1px solid rgba(255, 255, 255, 0.05);
+
+        .lw-card-grid {
+            grid-template-columns: 1fr
         }
-        .leaf-shape-1 {
-            border-radius: 0% 100% 0% 100% / 0% 100% 0% 100%;
+
+        .lw-card-header {
+            padding: 12px 16px
         }
-        .leaf-shape-2 {
-            border-radius: 100% 0% 100% 0% / 100% 0% 100% 0%;
-        }.sound-wave-bar {
-            animation: soundWave 1.2s ease-in-out infinite;
+
+        .lw-card-title {
+            font-size: 14px
         }
-        @keyframes soundWave {
-            0%, 100% { height: 40%; }
-            50% { height: 100%; }
+
+        .lw-lesson-list {
+            padding: 10px;
+            gap: 6px
         }
-    </style>
-</head>
-<body class="bg-background-light dark:bg-background-dark font-body text-gray-800 dark:text-gray-100 min-h-screen flex flex-col transition-colors duration-300 relative overflow-x-hidden">
-<div class="fixed top-0 left-0 w-64 h-64 bg-green-200/40 dark:bg-green-900/20 leaf-shape-1 -translate-x-16 -translate-y-16 blur-2xl pointer-events-none z-0"></div>
-<div class="fixed bottom-0 right-0 w-96 h-96 bg-green-300/30 dark:bg-green-800/20 leaf-shape-2 translate-x-32 translate-y-32 blur-3xl pointer-events-none z-0"></div>
-<div class="fixed top-1/4 right-10 w-32 h-32 bg-yellow-200/30 dark:bg-yellow-900/10 rounded-full blur-3xl pointer-events-none z-0"></div>
-<main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8 relative z-10 w-full max-w-7xl mx-auto">
-<header class="text-center mb-8 relative w-full">
-<h1 class="text-4xl md:text-5xl font-display font-bold text-primary dark:text-green-400 mb-2">Wi wa wakker</h1>
-<p class="text-lg text-gray-600 dark:text-gray-400 font-medium">Evelien Graat</p>
-<button aria-label="Toggle Dark Mode" class="absolute top-0 right-0 p-3 bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-700 rounded-full shadow-sm transition-all text-primary dark:text-green-400" onclick="document.documentElement.classList.toggle('dark')">
-<span class="material-icons-round text-2xl">brightness_4</span>
-</button>
-</header>
-<div class="flex flex-col md:flex-row items-center justify-center gap-8 w-full">
-<div class="hidden md:flex flex-col items-center justify-center relative">
-<div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-amber-700/20 dark:border-amber-700/50 overflow-hidden shadow-lg bg-amber-100 dark:bg-amber-900/30 relative">
-<img alt="Monkey character portrait" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY2gpRSH72gBq-AHGOhVQSbd0izYS38dP_tplRGPr8jZhLFIdlZP72i61hjrRSoMboAJsDA1T49gWuND_c2IG2n-h6DtfLZLRD5FWrK_b-2al4abWHXVndQGQSRyQwwJcP9bkQm5I4imYK6TUunIzudyr5CQDDjaxtQbi1OGyZ9a4wboMK4rLX7zohBb_dQm4sOsRLBqm3E3bnLWAJIEtq54hXe5vNtA5kD3RasSTUqTIXE01nQvTYGF9HbSiIM8cy1Jf2HFINQsI"/>
-</div>
-<div class="absolute -bottom-2 -right-2 bg-yellow-400 text-white rounded-full p-2 shadow-md w-10 h-10 flex items-center justify-center animate-bounce">
-<span class="material-icons-round text-sm">music_note</span>
-</div>
-</div>
-<div class="glass-panel bg-surface-light dark:bg-surface-dark shadow-glass dark:shadow-glass-dark rounded-3xl p-8 md:p-12 max-w-2xl w-full text-center md:text-left relative min-h-[500px] flex flex-col justify-center">
-<div class="hidden md:block absolute top-1/3 -left-4 w-8 h-8 bg-surface-light dark:bg-surface-dark transform rotate-45 border-l border-b border-white/30 dark:border-white/5"></div>
-<div class="space-y-6 text-xl md:text-2xl font-display leading-relaxed text-gray-800 dark:text-gray-200">
-<p>Ben je <span class="bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300 px-2 py-0.5 rounded-lg inline-block">wi wa wi wa</span> <span class="text-orange-500 dark:text-orange-400 font-bold">wakker</span></p>
-<p>Ben <span class="text-orange-500 dark:text-orange-400 font-bold">je wakker zing</span> met mij</p>
-<p>Ben je wi wa wi wa <span class="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-lg inline-block">wakker</span></p>
-<p>Ben je wakker <span class="text-orange-600 dark:text-orange-400 font-bold">dans</span> met mij</p>
-<p>En we poetsen <span class="text-pink-500 dark:text-pink-400 font-bold">onze tanden</span></p>
-<p>En wassen <span class="text-pink-500 dark:text-pink-400 font-bold">onze handen</span></p>
-<p>En we schudden <span class="text-pink-500 dark:text-pink-400 font-bold">onze billen</span> cha cha cha</p>
-<p>En we <span class="bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-lg inline-block font-medium">draaien</span> in het rond</p>
-<p>En we <span class="bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-lg inline-block font-medium">stampen</span> op de grond</p>
-<p>En we <span class="bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 px-2 py-0.5 rounded-lg inline-block font-medium">strekken</span> ons lekker uit</p>
-<p class="text-sm text-gray-400 dark:text-gray-500 italic mt-8 font-body">... (Chorus Repeats)</p>
-</div>
-</div>
-<div class="hidden md:flex flex-col items-center justify-center">
-<div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-green-600/20 dark:border-green-500/30 overflow-hidden shadow-lg bg-green-50 dark:bg-green-900/30 p-2">
-<img alt="Snake character portrait" class="w-full h-full object-contain rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWCW8BK0RVzfSU507flmW76eKLGBpNDcwUePzJEKbk4C4dy_iq2a2JdcHASKUcLasrVFmLF74GOXhq1P42yE21NPjV6B_9cI7Cf7dKRWLiay-DT3AX3oBiH3-qQjJEpHOQIxXOM6C9bq94q2Ly2FG6daTMfHBzQs-n92szWG8p0y217BTzXJciffvFVwQJTBVXhWY8_rFYjVmM0T8ljQ3cyvAWiL0mFAZP2IaiZGr-gISejaPwgsLuXe1yR0KU9leHLONNCDf5oA8"/>
-</div>
-</div>
-</div>
-</main>
-<div class="fixed bottom-24 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-3xl px-4">
-<div class="glass-panel bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-xl p-3 flex items-center justify-between gap-2 md:gap-4 overflow-x-auto no-scrollbar">
-<div class="flex items-center space-x-2 shrink-0">
-<button class="w-8 h-8 rounded-full bg-gray-600 text-white text-sm font-bold flex items-center justify-center shadow-md">1</button>
-<button class="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm font-bold flex items-center justify-center border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">2</button>
-<button class="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm font-bold flex items-center justify-center border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">3</button>
-<button class="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm font-bold flex items-center justify-center border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">4</button>
-<button class="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm font-bold flex items-center justify-center border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">5</button>
-</div>
-<div class="w-px h-8 bg-gray-300 dark:bg-gray-600 shrink-0 mx-2"></div>
-<div class="flex items-center space-x-2 md:space-x-4 shrink-0">
-<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors">
-<span class="material-icons-round">arrow_back</span>
-</button>
-<button class="px-4 py-2 bg-red-400 hover:bg-red-500 text-white rounded-xl text-sm font-bold uppercase tracking-wide shadow-md transition-all">
-                    Verbergen
-                </button>
-<button class="px-4 py-2 bg-pink-300 hover:bg-pink-400 text-white rounded-xl text-sm font-bold uppercase tracking-wide shadow-md transition-all">
-                    Hide All
-                </button>
-<button class="px-4 py-2 bg-pink-400 hover:bg-pink-500 text-white rounded-xl text-sm font-bold uppercase tracking-wide shadow-md transition-all">
-                    Show All
-                </button>
-<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors">
-<span class="material-icons-round">arrow_forward</span>
-</button>
-</div>
-<div class="hidden md:flex flex-col items-end text-xs text-gray-400 dark:text-gray-500 font-bold ml-2">
-<span>Page</span>
-<span class="text-lg text-gray-600 dark:text-gray-300">1/5</span>
-</div>
-</div>
-</div>
-<div class="fixed bottom-0 w-full bg-white dark:bg-gray-900 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-30 px-4 py-3 border-t border-gray-100 dark:border-gray-800">
-<div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
-<div class="flex items-center gap-4 shrink-0">
-<button class="w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center shadow-lg transition-transform hover:scale-105">
-<span class="material-icons-round text-3xl ml-1">play_arrow</span>
-</button>
-<div class="hidden sm:block">
-<p class="text-xs font-bold text-gray-400 dark:text-gray-500 tracking-wider uppercase">Sounds for Freedom</p>
-<p class="text-sm font-bold text-gray-800 dark:text-gray-200 truncate max-w-[200px] md:max-w-xs">Thema 04 Lichaam, dokter &amp; tandarts - Les 1 Wi-Wa-Wakker</p>
-</div>
-</div>
-<div class="flex-grow hidden md:flex items-center justify-center h-8 gap-[2px] opacity-60">
-<script>
-                    for(let i=0; i<60; i++) {
-                        let height = Math.floor(Math.random() * 60) + 20;
-                        document.write(`<div class="w-1 bg-gray-300 dark:bg-gray-600 rounded-full sound-wave-bar" style="height: ${height}%; animation-delay: -${Math.random()}s"></div>`);
-                    }
-                </script>
-</div>
-<div class="flex-grow md:hidden h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-<div class="h-full bg-orange-400 w-1/3 rounded-full"></div>
-</div>
-<div class="flex items-center gap-2 shrink-0 text-gray-400 dark:text-gray-500">
-<span class="material-icons-round text-orange-400">cloud</span>
-<span class="text-xs font-bold tracking-widest uppercase hidden sm:block">SoundCloud</span>
-</div>
-</div>
+
+        .lw-lesson-item {
+            padding: 10px 12px
+        }
+
+        .lw-lesson-name {
+            font-size: 12px
+        }
+
+        .lw-btn {
+            padding: 7px 14px;
+            font-size: 11px
+        }
+
+        .lw-word-list {
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr))
+        }
+
+        .lw-word-list li {
+            font-size: 13px;
+            padding: 12px 8px
+        }
+    }
+
+    /* LearnWorlds divider'ı modal açıkken gizle */
+    body.lw-modal-open .learnworlds-divider-wrapper,
+    body.lw-modal-open .divider-front,
+    body.lw-modal-open [class*="learnworlds-divider"],
+    body.lw-modal-open [class*="divider-wrapper"] {
+        z-index: 0 !important;
+        pointer-events: none !important;
+    }
+</style>
+
+<div id="lw-word-app">
+    <div class="lw-card-grid" id="lwCardGrid"></div>
+    <div class="lw-modal-overlay" id="lwModalOverlay" onclick="if(event.target===this)lwCloseModal()">
+        <div class="lw-modal">
+            <div class="lw-modal-header">
+                <h3 class="lw-modal-title" id="lwModalTitle">Les</h3>
+                <button class="lw-close-btn" onclick="lwCloseModal()">×</button>
+            </div>
+            <div class="lw-modal-body">
+                <ul class="lw-word-list" id="lwWordList"></ul>
+            </div>
+            <div class="lw-modal-footer">
+                <button class="lw-btn lw-btn-copy" id="lwCopyBtn" onclick="lwCopyWords()">Kopiëren</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-</body></html>
+<script>
+    var lwData = [
+        {
+            t: "Klanken", c: "", l: [
+                { n: "Les 1: aai, ooi, oei", w: ["aai", "ooi", "oei", "kraai", "kooi", "mooi", "groei"] },
+                { n: "Les 2: s / ss", w: ["sok", "glas", "kussen", "mossel", "das", "wassen"] },
+                { n: "Les 3: t / d", w: ["hond", "kat", "bed", "wand", "tijd", "stad", "hand"] },
+                { n: "Les 4: ee, eu, oo", w: ["been", "zee", "neus", "deur", "boom", "rood"] }
+            ]
+        },
+        {
+            t: "BAK - woorden", c: "lw-theme-2", l: [
+                { n: "Les 1: Boerderij", w: ["koe", "geit", "kip", "stal", "melk", "trekker", "boer", "paard"] },
+                { n: "Les 2: Dierentuin", w: ["leeuw", "tijger", "aap", "slang", "beer", "zebra", "olifant", "giraffe"] },
+                { n: "Les 3: School", w: ["pen", "boek", "schrift", "bord", "tas", "potlood", "gum", "liniaal"] },
+                { n: "Les 4: Lichaam", w: ["hoofd", "arm", "been", "hand", "voet", "oog", "neus", "mond"] }
+            ]
+        }
+    ];
+    var lwCurrentWords = [];
+
+    function lwOpenModal(ti, li) {
+        var lesson = lwData[ti].l[li];
+        lwCurrentWords = lesson.w;
+        document.getElementById('lwModalTitle').textContent = lesson.n;
+        document.getElementById('lwWordList').innerHTML = lesson.w.map(function (w) { return '<li>' + w + '</li>' }).join('');
+        document.body.classList.add('lw-modal-open');
+        document.getElementById('lwModalOverlay').classList.add('lw-active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function lwCloseModal() {
+        document.getElementById('lwModalOverlay').classList.remove('lw-active');
+        document.body.classList.remove('lw-modal-open');
+        document.body.style.overflow = '';
+    }
+
+    function lwCopyWords() {
+        var btn = document.getElementById('lwCopyBtn');
+        navigator.clipboard.writeText(lwCurrentWords.join('\n')).then(function () {
+            btn.textContent = '✓ Gekopieerd!';
+            btn.disabled = true;
+            setTimeout(function () { btn.textContent = 'Kopiëren'; btn.disabled = false }, 1500);
+        });
+    }
+
+    function lwRenderGrid() {
+        var grid = document.getElementById('lwCardGrid');
+        grid.innerHTML = '';
+        lwData.forEach(function (theme, ti) {
+            var card = document.createElement('div');
+            card.className = 'lw-theme-card';
+            var html = theme.l.map(function (lesson, li) {
+                return '<li class="lw-lesson-item"><span class="lw-lesson-name">' + lesson.n + '</span><button class="lw-btn" onclick="lwOpenModal(' + ti + ',' + li + ')">Open</button></li>';
+            }).join('');
+            card.innerHTML = '<div class="lw-card-header ' + theme.c + '"><h3 class="lw-card-title">' + theme.t + '</h3></div><ul class="lw-lesson-list">' + html + '</ul>';
+            grid.appendChild(card);
+        });
+    }
+
+    lwRenderGrid();
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.getElementById('lwModalOverlay').classList.contains('lw-active')) lwCloseModal() });
+</script>

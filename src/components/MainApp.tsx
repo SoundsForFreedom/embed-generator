@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Layers, FileText } from "lucide-react";
+import { Layers, FileText, BookOpen } from "lucide-react";
 import EmbedGenerator from "./EmbedGenerator";
 import GatenTekstGenerator from "./GatenTekstGenerator";
+import WoordenlijstGenerator from "./WoordenlijstGenerator";
 
-type AppMode = "flashcards" | "gaten-tekst";
+type AppMode = "flashcards" | "gaten-tekst" | "woordenlijst";
 
 const MainApp = () => {
   const [mode, setMode] = useState<AppMode>("flashcards");
@@ -34,6 +35,16 @@ const MainApp = () => {
               <FileText className="w-5 h-5" />
               Gaten tekst
             </button>
+            <button
+              onClick={() => setMode("woordenlijst")}
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${mode === "woordenlijst"
+                ? "bg-primary text-primary-foreground shadow-lg scale-105"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+            >
+              <BookOpen className="w-5 h-5" />
+              Woordenlijst
+            </button>
           </div>
         </div>
       </div>
@@ -41,7 +52,7 @@ const MainApp = () => {
       {/* Content */}
       {mode === "flashcards" ? (
         <EmbedGenerator />
-      ) : (
+      ) : mode === "gaten-tekst" ? (
         <div className="p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
@@ -57,9 +68,26 @@ const MainApp = () => {
             <GatenTekstGenerator />
           </div>
         </div>
+      ) : (
+        <div className="p-4 md:p-8">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
+            <header className="text-center mb-8">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-slate-700 mb-3">
+                📚 SoundsForFreedom Woordenlijst
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+
+              </p>
+            </header>
+
+            <WoordenlijstGenerator />
+          </div>
+        </div>
       )}
     </div>
   );
 };
 
 export default MainApp;
+
