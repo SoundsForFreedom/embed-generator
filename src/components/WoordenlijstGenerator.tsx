@@ -598,29 +598,85 @@ const WoordenlijstGenerator = () => {
         );
     };
 
+    // Compact color picker - just color input and label inline
     const ColorPicker = ({ label, colorKey, value }: { label: string; colorKey: keyof ColorSettings; value: string }) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
             <input
                 type="color"
                 value={value}
                 onChange={(e) => updateColor(colorKey, e.target.value)}
-                className="w-10 h-10 rounded-lg cursor-pointer border-2 border-border"
+                className="w-7 h-7 rounded cursor-pointer border border-border flex-shrink-0"
             />
-            <div className="flex-1">
-                <Label className="text-xs text-muted-foreground">{label}</Label>
-                <Input
-                    value={value}
-                    onChange={(e) => updateColor(colorKey, e.target.value)}
-                    className="input-playful text-xs font-mono h-8"
-                />
-            </div>
+            <span className="text-xs text-muted-foreground truncate">{label}</span>
         </div>
     );
+
+    // Color presets for quick selection
+    const COLOR_PRESETS = [
+        // Primaire kleuren
+        { name: "Paars", primary: "#7c6fea", secondary: "#6eb5d9", accent: "#e8a0bf" },
+        { name: "Blauw", primary: "#3b82f6", secondary: "#06b6d4", accent: "#8b5cf6" },
+        { name: "Groen", primary: "#22c55e", secondary: "#10b981", accent: "#84cc16" },
+        { name: "Oranje", primary: "#f97316", secondary: "#eab308", accent: "#ef4444" },
+        { name: "Roze", primary: "#ec4899", secondary: "#f472b6", accent: "#a855f7" },
+        // Natuur kleuren
+        { name: "Zee", primary: "#0ea5e9", secondary: "#38bdf8", accent: "#7dd3fc" },
+        { name: "Bos", primary: "#15803d", secondary: "#22c55e", accent: "#4ade80" },
+        { name: "Zon", primary: "#fbbf24", secondary: "#f59e0b", accent: "#fcd34d" },
+        { name: "Koraal", primary: "#fb7185", secondary: "#f43f5e", accent: "#fda4af" },
+        { name: "Lavendel", primary: "#a78bfa", secondary: "#8b5cf6", accent: "#c4b5fd" },
+        // Modern kleuren
+        { name: "Mint", primary: "#34d399", secondary: "#10b981", accent: "#6ee7b7" },
+        { name: "Indigo", primary: "#6366f1", secondary: "#4f46e5", accent: "#818cf8" },
+        { name: "Amber", primary: "#f59e0b", secondary: "#d97706", accent: "#fbbf24" },
+        { name: "Robijn", primary: "#e11d48", secondary: "#be123c", accent: "#fb7185" },
+        { name: "Turquoise", primary: "#14b8a6", secondary: "#0d9488", accent: "#5eead4" },
+    ];
+
+    const applyPreset = (preset: typeof COLOR_PRESETS[0]) => {
+        setColors(prev => ({
+            ...prev,
+            headerGradient1Start: preset.primary,
+            headerGradient1End: lightenColor(preset.primary, 30),
+            headerGradient2Start: preset.secondary,
+            headerGradient2End: lightenColor(preset.secondary, 20),
+            buttonBackground: preset.primary,
+            buttonHoverBackground: darkenColor(preset.primary, 15),
+            modalHeaderGradientStart: preset.primary,
+            modalHeaderGradientEnd: preset.accent,
+            lessonItemHoverBg: lightenColor(preset.primary, 45),
+            lessonItemHoverBorder: lightenColor(preset.primary, 25),
+            wordListItemHoverBg: lightenColor(preset.primary, 45),
+            wordListItemHoverBorder: lightenColor(preset.primary, 25),
+            copyButtonBg: preset.secondary,
+            copyButtonHoverBg: darkenColor(preset.secondary, 15),
+        }));
+        toast.success(`${preset.name} thema toegepast!`);
+    };
+
+    // Helper functions for color manipulation
+    function lightenColor(hex: string, percent: number): string {
+        const num = parseInt(hex.replace('#', ''), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.min(255, (num >> 16) + amt);
+        const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+        const B = Math.min(255, (num & 0x0000FF) + amt);
+        return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+    }
+
+    function darkenColor(hex: string, percent: number): string {
+        const num = parseInt(hex.replace('#', ''), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.max(0, (num >> 16) - amt);
+        const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
+        const B = Math.max(0, (num & 0x0000FF) - amt);
+        return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+    }
 
     return (
         <div className="space-y-6">
             <Tabs defaultValue="woorden" className="space-y-6">
-                <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-5 h-14 rounded-2xl bg-muted p-1">
+                <TabsList className="grid w-full max-w-xl mx-auto grid-cols-4 h-14 rounded-2xl bg-muted p-1">
                     <TabsTrigger value="woorden" className="rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                         <BookOpen className="w-4 h-4 mr-1" />
                         Klankoefening
@@ -632,10 +688,6 @@ const WoordenlijstGenerator = () => {
                     <TabsTrigger value="style" className="rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                         <Palette className="w-4 h-4 mr-1" />
                         Style
-                    </TabsTrigger>
-                    <TabsTrigger value="preview" className="rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                        <Eye className="w-4 h-4 mr-1" />
-                        Preview
                     </TabsTrigger>
                     <TabsTrigger value="code" className="rounded-xl font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                         <Copy className="w-4 h-4 mr-1" />
@@ -667,119 +719,122 @@ const WoordenlijstGenerator = () => {
 
                 {/* Style Tab */}
                 <TabsContent value="style" className="animate-pop-in">
-                    <div className="card-playful p-6 border-primary/20">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {/* Card Headers */}
-                            <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                                <h3 className="font-bold flex items-center gap-2">
-                                    <Palette className="w-4 h-4" />
-                                    Thema 1 Header
-                                </h3>
-                                <ColorPicker label="Gradient Start" colorKey="headerGradient1Start" value={colors.headerGradient1Start} />
-                                <ColorPicker label="Gradient End" colorKey="headerGradient1End" value={colors.headerGradient1End} />
+                    <div className="card-playful p-4 border-primary/20">
+                        {/* Color Presets Row */}
+                        <div className="mb-4 p-3 bg-muted/50 rounded-xl">
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-sm font-bold text-muted-foreground mr-2">Snelle thema's:</span>
+                                {COLOR_PRESETS.map((preset) => (
+                                    <button
+                                        key={preset.name}
+                                        onClick={() => applyPreset(preset)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:border-primary/50 transition-all hover:scale-105"
+                                        style={{ background: `linear-gradient(135deg, ${preset.primary}, ${preset.secondary})` }}
+                                    >
+                                        <span className="text-white text-xs font-bold drop-shadow">{preset.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Split Layout: Colors + Preview */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {/* Left: Compact Color Controls */}
+                            <div className="space-y-3">
+                                {/* Headers Row */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="p-3 bg-muted/30 rounded-lg">
+                                        <h4 className="text-xs font-bold mb-2 text-muted-foreground">Thema 1 Header</h4>
+                                        <div className="flex gap-2">
+                                            <ColorPicker label="Start" colorKey="headerGradient1Start" value={colors.headerGradient1Start} />
+                                            <ColorPicker label="End" colorKey="headerGradient1End" value={colors.headerGradient1End} />
+                                        </div>
+                                    </div>
+                                    <div className="p-3 bg-muted/30 rounded-lg">
+                                        <h4 className="text-xs font-bold mb-2 text-muted-foreground">Thema 2 Header</h4>
+                                        <div className="flex gap-2">
+                                            <ColorPicker label="Start" colorKey="headerGradient2Start" value={colors.headerGradient2Start} />
+                                            <ColorPicker label="End" colorKey="headerGradient2End" value={colors.headerGradient2End} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Cards Row */}
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="p-3 bg-muted/30 rounded-lg">
+                                        <h4 className="text-xs font-bold mb-2 text-muted-foreground">Kaart</h4>
+                                        <div className="flex gap-2">
+                                            <ColorPicker label="BG" colorKey="cardBackground" value={colors.cardBackground} />
+                                            <ColorPicker label="Rand" colorKey="cardBorder" value={colors.cardBorder} />
+                                        </div>
+                                    </div>
+                                    <div className="p-3 bg-muted/30 rounded-lg">
+                                        <h4 className="text-xs font-bold mb-2 text-muted-foreground">Knop</h4>
+                                        <div className="flex gap-2">
+                                            <ColorPicker label="BG" colorKey="buttonBackground" value={colors.buttonBackground} />
+                                            <ColorPicker label="Tekst" colorKey="buttonText" value={colors.buttonText} />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Lesson Items */}
+                                <div className="p-3 bg-muted/30 rounded-lg">
+                                    <h4 className="text-xs font-bold mb-2 text-muted-foreground">Les Items</h4>
+                                    <div className="flex gap-2 flex-wrap">
+                                        <ColorPicker label="BG" colorKey="lessonItemBackground" value={colors.lessonItemBackground} />
+                                        <ColorPicker label="Rand" colorKey="lessonItemBorder" value={colors.lessonItemBorder} />
+                                        <ColorPicker label="Hover" colorKey="lessonItemHoverBg" value={colors.lessonItemHoverBg} />
+                                        <ColorPicker label="Tekst" colorKey="lessonNameColor" value={colors.lessonNameColor} />
+                                    </div>
+                                </div>
+
+                                {/* Modal */}
+                                <div className="p-3 bg-muted/30 rounded-lg">
+                                    <h4 className="text-xs font-bold mb-2 text-muted-foreground">Modal</h4>
+                                    <div className="flex gap-2 flex-wrap">
+                                        <ColorPicker label="Start" colorKey="modalHeaderGradientStart" value={colors.modalHeaderGradientStart} />
+                                        <ColorPicker label="End" colorKey="modalHeaderGradientEnd" value={colors.modalHeaderGradientEnd} />
+                                        <ColorPicker label="Kopieer" colorKey="copyButtonBg" value={colors.copyButtonBg} />
+                                    </div>
+                                </div>
+
+                                {/* Word List */}
+                                <div className="p-3 bg-muted/30 rounded-lg">
+                                    <h4 className="text-xs font-bold mb-2 text-muted-foreground">Woorden</h4>
+                                    <div className="flex gap-2 flex-wrap">
+                                        <ColorPicker label="BG" colorKey="wordListItemBg" value={colors.wordListItemBg} />
+                                        <ColorPicker label="Rand" colorKey="wordListItemBorder" value={colors.wordListItemBorder} />
+                                        <ColorPicker label="Tekst" colorKey="wordListItemColor" value={colors.wordListItemColor} />
+                                        <ColorPicker label="Hover" colorKey="wordListItemHoverBg" value={colors.wordListItemHoverBg} />
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                                <h3 className="font-bold flex items-center gap-2">
-                                    <Palette className="w-4 h-4" />
-                                    Thema 2 Header
-                                </h3>
-                                <ColorPicker label="Gradient Start" colorKey="headerGradient2Start" value={colors.headerGradient2Start} />
-                                <ColorPicker label="Gradient End" colorKey="headerGradient2End" value={colors.headerGradient2End} />
-                            </div>
-
-                            {/* Card Styles */}
-                            <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                                <h3 className="font-bold flex items-center gap-2">
-                                    <Type className="w-4 h-4" />
-                                    Kaart Stijl
-                                </h3>
-                                <ColorPicker label="Achtergrond" colorKey="cardBackground" value={colors.cardBackground} />
-                                <ColorPicker label="Rand" colorKey="cardBorder" value={colors.cardBorder} />
-                            </div>
-
-                            {/* Button */}
-                            <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                                <h3 className="font-bold flex items-center gap-2">
-                                    <Type className="w-4 h-4" />
-                                    Knop
-                                </h3>
-                                <ColorPicker label="Achtergrond" colorKey="buttonBackground" value={colors.buttonBackground} />
-                                <ColorPicker label="Tekst" colorKey="buttonText" value={colors.buttonText} />
-                                <ColorPicker label="Hover" colorKey="buttonHoverBackground" value={colors.buttonHoverBackground} />
-                            </div>
-
-                            {/* Lesson Item */}
-                            <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                                <h3 className="font-bold flex items-center gap-2">
-                                    <List className="w-4 h-4" />
-                                    Les Item
-                                </h3>
-                                <ColorPicker label="Achtergrond" colorKey="lessonItemBackground" value={colors.lessonItemBackground} />
-                                <ColorPicker label="Rand" colorKey="lessonItemBorder" value={colors.lessonItemBorder} />
-                                <ColorPicker label="Hover BG" colorKey="lessonItemHoverBg" value={colors.lessonItemHoverBg} />
-                                <ColorPicker label="Tekst" colorKey="lessonNameColor" value={colors.lessonNameColor} />
-                            </div>
-
-                            {/* Modal */}
-                            <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                                <h3 className="font-bold flex items-center gap-2">
-                                    <Palette className="w-4 h-4" />
-                                    Modal Header
-                                </h3>
-                                <ColorPicker label="Gradient Start" colorKey="modalHeaderGradientStart" value={colors.modalHeaderGradientStart} />
-                                <ColorPicker label="Gradient End" colorKey="modalHeaderGradientEnd" value={colors.modalHeaderGradientEnd} />
-                            </div>
-
-                            {/* Word List */}
-                            <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                                <h3 className="font-bold flex items-center gap-2">
-                                    <BookOpen className="w-4 h-4" />
-                                    Woorden Lijst
-                                </h3>
-                                <ColorPicker label="Achtergrond" colorKey="wordListItemBg" value={colors.wordListItemBg} />
-                                <ColorPicker label="Rand" colorKey="wordListItemBorder" value={colors.wordListItemBorder} />
-                                <ColorPicker label="Tekst" colorKey="wordListItemColor" value={colors.wordListItemColor} />
-                                <ColorPicker label="Hover BG" colorKey="wordListItemHoverBg" value={colors.wordListItemHoverBg} />
-                            </div>
-
-                            {/* Copy Button */}
-                            <div className="p-4 bg-muted/50 rounded-xl space-y-3">
-                                <h3 className="font-bold flex items-center gap-2">
-                                    <Copy className="w-4 h-4" />
-                                    Kopieer Knop
-                                </h3>
-                                <ColorPicker label="Achtergrond" colorKey="copyButtonBg" value={colors.copyButtonBg} />
-                                <ColorPicker label="Hover" colorKey="copyButtonHoverBg" value={colors.copyButtonHoverBg} />
+                            {/* Right: Live Preview */}
+                            <div className="lg:sticky lg:top-20">
+                                <div className="bg-muted/30 rounded-lg p-2">
+                                    <div className="flex items-center gap-2 mb-2 px-2">
+                                        <Eye className="w-4 h-4 text-primary" />
+                                        <span className="text-sm font-bold text-muted-foreground">Live Preview</span>
+                                    </div>
+                                    <div className="border rounded-lg overflow-hidden bg-white">
+                                        <iframe
+                                            srcDoc={generatedCode}
+                                            title="Preview"
+                                            className="w-full h-[400px] border-0"
+                                            sandbox="allow-scripts"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-2 text-center">
+                                        💡 Klik op "Open" om modal te testen
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </TabsContent>
 
-                {/* Preview Tab */}
-                <TabsContent value="preview" className="animate-pop-in">
-                    <div className="card-playful p-6 border-primary/20">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                                <Eye className="w-5 h-5 text-primary" />
-                                Live Preview
-                            </h2>
-                        </div>
 
-                        <div className="border rounded-xl overflow-hidden bg-white">
-                            <iframe
-                                srcDoc={generatedCode}
-                                title="Preview"
-                                className="w-full h-[600px] border-0"
-                                sandbox="allow-scripts"
-                            />
-                        </div>
-
-                        <p className="text-xs text-muted-foreground mt-4 text-center">
-                            💡 Klik op "Open" knoppen om de modal te testen
-                        </p>
-                    </div>
-                </TabsContent>
 
                 {/* Code Tab */}
                 <TabsContent value="code" className="animate-pop-in">

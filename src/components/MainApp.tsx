@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layers, FileText, BookOpen } from "lucide-react";
+import { Layers, FileText, List } from "lucide-react";
 import EmbedGenerator from "./EmbedGenerator";
 import GatenTekstGenerator from "./GatenTekstGenerator";
 import WoordenlijstGenerator from "./WoordenlijstGenerator";
@@ -42,7 +42,7 @@ const MainApp = () => {
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
                 }`}
             >
-              <BookOpen className="w-5 h-5" />
+              <List className="w-5 h-5" />
               Woordenlijst
             </button>
           </div>
