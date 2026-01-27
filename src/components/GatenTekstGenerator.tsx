@@ -444,6 +444,59 @@ ${inlineJs}
     toast.success("All fields cleared");
   };
 
+
+  // Color presets for quick selection (Same as WoordenlijstGenerator)
+  const COLOR_PRESETS = [
+    // Primaire kleuren
+    { name: "Paars", primary: "#7c6fea", secondary: "#6eb5d9", accent: "#e8a0bf" },
+    { name: "Blauw", primary: "#3b82f6", secondary: "#06b6d4", accent: "#8b5cf6" },
+    { name: "Groen", primary: "#22c55e", secondary: "#10b981", accent: "#84cc16" },
+    { name: "Oranje", primary: "#f97316", secondary: "#eab308", accent: "#ef4444" },
+    { name: "Roze", primary: "#ec4899", secondary: "#f472b6", accent: "#a855f7" },
+    // Natuur kleuren
+    { name: "Zee", primary: "#0ea5e9", secondary: "#38bdf8", accent: "#7dd3fc" },
+    { name: "Bos", primary: "#15803d", secondary: "#22c55e", accent: "#4ade80" },
+    { name: "Zon", primary: "#fbbf24", secondary: "#f59e0b", accent: "#fcd34d" },
+    { name: "Koraal", primary: "#fb7185", secondary: "#f43f5e", accent: "#fda4af" },
+    { name: "Lavendel", primary: "#a78bfa", secondary: "#8b5cf6", accent: "#c4b5fd" },
+    // Modern kleuren
+    { name: "Mint", primary: "#34d399", secondary: "#10b981", accent: "#6ee7b7" },
+    { name: "Indigo", primary: "#6366f1", secondary: "#4f46e5", accent: "#818cf8" },
+    { name: "Amber", primary: "#f59e0b", secondary: "#d97706", accent: "#fbbf24" },
+    { name: "Robijn", primary: "#e11d48", secondary: "#be123c", accent: "#fb7185" },
+    { name: "Turquoise", primary: "#14b8a6", secondary: "#0d9488", accent: "#5eead4" },
+  ];
+
+  // Helper functions for color manipulation
+  function lightenColor(hex: string, percent: number): string {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.min(255, (num >> 16) + amt);
+    const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+    const B = Math.min(255, (num & 0x0000FF) + amt);
+    return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+  }
+
+  function darkenColor(hex: string, percent: number): string {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.max(0, (num >> 16) - amt);
+    const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
+    const B = Math.max(0, (num & 0x0000FF) - amt);
+    return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+  }
+
+  const applyPreset = (preset: typeof COLOR_PRESETS[0]) => {
+    setPageBgColor(lightenColor(preset.primary, 45)); // Very light background
+    setTitleColor(preset.primary);
+    setAuthorColor(darkenColor(preset.secondary, 10));
+    setWordColor(preset.accent); // Or secondary
+    setPlayerColor(preset.primary);
+    setPlaceholderColor(preset.accent);
+    setPatternColor(preset.secondary);
+    toast.success(`${preset.name} thema toegepast!`);
+  };
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="editor" className="space-y-6">
@@ -650,6 +703,29 @@ Wrap hidden words in parentheses: (word)`}
         {/* Style Tab */}
         <TabsContent value="style" className="animate-pop-in">
           <div className="card-playful p-6 border-primary/20">
+            {/* Color Presets */}
+            <div className="mb-8 p-4 bg-muted/30 rounded-2xl border border-primary/10">
+              <Label className="font-bold text-foreground mb-3 flex items-center gap-2">
+                <Palette className="w-4 h-4" />
+                Snelle thema's (Kies een kleurthema)
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {COLOR_PRESETS.map((preset) => (
+                  <button
+                    key={preset.name}
+                    onClick={() => applyPreset(preset)}
+                    className="px-3 py-1.5 rounded-full text-xs font-bold text-white transition-all hover:scale-105 active:scale-95 shadow-sm"
+                    style={{
+                      backgroundColor: preset.primary,
+                      backgroundImage: `linear-gradient(to bottom right, ${preset.primary}, ${preset.secondary})`
+                    }}
+                  >
+                    {preset.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
               {/* Page Background */}
