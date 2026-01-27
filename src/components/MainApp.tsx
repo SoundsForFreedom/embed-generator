@@ -74,7 +74,7 @@ const MainApp = () => {
             {/* Header */}
             <header className="text-center mb-8">
               <h1 className="text-4xl md:text-5xl font-extrabold text-slate-700 mb-3">
-                📚 SoundsForFreedom Woordenlijst
+                ▤ SoundsForFreedom Woordenlijst
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
 
