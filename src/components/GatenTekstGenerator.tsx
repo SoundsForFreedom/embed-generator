@@ -327,14 +327,14 @@ ${textHtml}
 
     <div class="lw-bar">
       <div class="lw-row">
-        <button class="lw-btn nav" id="btnVorige">◀</button>
+        <button class="lw-btn nav" id="btnVorige">▲</button>
         <span class="lw-ind" id="lw-ind">1/1</span>
-        <button class="lw-btn nav" id="btnVolgende">▶</button>
+        <button class="lw-btn nav" id="btnVolgende">▼</button>
         <div class="lw-div"></div>
         <button class="lw-btn tog" id="btnWissel">Hide</button>
         <div class="lw-div"></div>
-        <button class="lw-btn" id="btnVerbergAlles">Alles ▼</button>
-        <button class="lw-btn" id="btnToonAlles">Alles ▲</button>
+        <button class="lw-btn" id="btnVerbergAlles"> Tekst Uit ▼</button>
+        <button class="lw-btn" id="btnToonAlles"> Tekst Aan ▲</button>
         <div class="lw-div"></div>
         <button class="lw-btn pr icon-btn" id="btnAfdrukken" title="Print">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
@@ -351,7 +351,7 @@ ${textHtml}
         
         <!-- Track Info -->
         <div class="lw-track-info">
-          <div class="lw-track-status" id="lw-track-status">VOCAL</div>
+          <div class="lw-track-status" id="lw-track-status">VOCAAL</div>
           <div class="lw-track-title" id="lw-track-title">Loading...</div>
         </div>
         
@@ -364,12 +364,12 @@ ${textHtml}
         <!-- Mode Switch (Vocal/Instrumental) -->
         <div class="lw-mode-switch" id="lw-mode-switch" style="display:none;">
           <button class="lw-mode-btn active" data-mode="vocal">
-            <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
-            Vocal
+            <svg viewBox="0 0 17 17" fill="currentColor" stroke="none"><path d="M7.942,0.751 L6.035,0.042 L6.035,11.139 C5.433,11.089 4.75,11.176 4.111,11.438 C2.517,12.089 1.689,13.655 2.146,14.75 C2.604,15.848 4.175,16.354 5.767,15.703 C6.991,15.203 7.84,14.252 7.951,13.341 L7.943,3.524 C10.57,4.322 12.463,5.197 12.463,7.808 C12.463,8.735 13.983,9.631 13.983,5.996 C13.982,2.904 11.33,1.034 7.942,0.751 L7.942,0.751 Z"/></svg>
+            Vocaal
           </button>
           <button class="lw-mode-btn" data-mode="instrumental">
-            <svg viewBox="0 0 24 24"><line x1="1" x2="23" y1="1" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94 0v5.8"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/><line x1="12" x2="12" y1="19" y2="22"/><line x1="8" x2="16" y1="22" y2="22"/></svg>
-            Inst
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="7.1" y2="16.9"/><path d="M16.75,11l-7.53,6.7a1,1,0,0,1-1.37,0l-1.5-1.5a1,1,0,0,1,0-1.37L13,7.25Zm3.08-6.82a4,4,0,0,0-5.66,0A4,4,0,0,0,13,7.27l3.7,3.7a4,4,0,0,0,3.1-1.14A4,4,0,0,0,19.83,4.17Z"/><line x1="17.71" y1="11.95" x2="12.05" y2="6.29"/></svg>
+            Karaoke
           </button>
         </div>
       </div>

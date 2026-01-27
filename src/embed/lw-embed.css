@@ -104,19 +104,21 @@
 /* Side image container - FIXED so they don't scroll */
 .lw-side-image {
     position: fixed;
-    z-index: 5;
+
     pointer-events: none;
 }
 
 .lw-side-image.lw-left {
     left: 2rem;
     top: 50%;
+    z-index: 1;
     transform: translateY(-50%);
 }
 
 .lw-side-image.lw-right {
     right: 2rem;
     top: 50%;
+    z-index: 5;
     transform: translateY(-50%);
 }
 
@@ -346,7 +348,7 @@
     border-radius: 50%;
     background: #e2e8f0;
     color: #1e293b;
-    font-size: 1.4rem;
+    font-size: 2rem;
     /* Big arrows */
 }
 

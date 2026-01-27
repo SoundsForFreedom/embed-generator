@@ -261,7 +261,7 @@
                         instWidget.seekTo(pos);
                         if (isPlaying) instWidget.play();
                         activePlayer = 'instrumental';
-                        if (statusEl) statusEl.textContent = 'INSTRUMENTAL';
+                        if (statusEl) statusEl.textContent = 'KARAOKE';
                     });
                 } else if (newMode === 'vocal' && vocalWidget && instWidget) {
                     instWidget.getPosition(function (pos) {
@@ -269,7 +269,7 @@
                         vocalWidget.seekTo(pos);
                         if (isPlaying) vocalWidget.play();
                         activePlayer = 'vocal';
-                        if (statusEl) statusEl.textContent = 'VOCAL';
+                        if (statusEl) statusEl.textContent = 'VOCAAL';
                     });
                 }
             };
