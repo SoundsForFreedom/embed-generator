@@ -45,11 +45,12 @@ const parseFilename = (filename: string): { name: string; lessonCode: string } =
   }
 };
 
-const defaultCards: CardData[] = Array(8).fill(null).map((_, i) => ({
-  imageUrl: "",
-  text: `Card ${i + 1}`,
-  lessonCode: "",
-}));
+const createDefaultCards = (count: number): CardData[] =>
+  Array(count).fill(null).map((_, i) => ({
+    imageUrl: "",
+    text: `Card ${i + 1}`,
+    lessonCode: "",
+  }));
 
 // Convert Google Drive link to embed format (using thumbnail format)
 const convertGoogleDriveLink = (url: string): string => {
@@ -118,7 +119,7 @@ const fetchFilenameFromAPI = async (fileId: string): Promise<string> => {
 
 const EmbedGenerator = () => {
   const [cardCount, setCardCount] = useState<8 | 16 | 24>(8);
-  const [cards, setCards] = useState<CardData[]>(defaultCards);
+  const [cards, setCards] = useState<CardData[]>(createDefaultCards(8));
   const [borderColor, setBorderColor] = useState("#FF6B9D");
   const [textColor, setTextColor] = useState("#FFFFFF");
   const [copied, setCopied] = useState(false);
@@ -126,21 +127,18 @@ const EmbedGenerator = () => {
   const [bulkTexts, setBulkTexts] = useState("");
   const [isLoadingFilenames, setIsLoadingFilenames] = useState(false);
 
-  // Handle card count change
+  // Reset cards when cardCount changes
   const handleCardCountChange = (newCount: 8 | 16 | 24) => {
     setCardCount(newCount);
-    setCards(prev => {
-      if (newCount > prev.length) {
-        // Add new empty cards
-        return [...prev, ...Array(newCount - prev.length).fill(null).map((_, i) => ({
-          imageUrl: "",
-          text: `Card ${prev.length + i + 1}`,
-          lessonCode: "",
-        }))];
-      } else {
-        // Trim cards
-        return prev.slice(0, newCount);
-      }
+    setCards(prevCards => {
+      const newCards = createDefaultCards(newCount);
+      // Preserve existing card data
+      prevCards.forEach((card, i) => {
+        if (i < newCount) {
+          newCards[i] = card;
+        }
+      });
+      return newCards;
     });
   };
 
@@ -226,16 +224,17 @@ const EmbedGenerator = () => {
 
   const generatedCode = useMemo(() => {
     // Split cards into pages of 8
-    const totalPages = Math.ceil(cards.length / 8);
+
     const pages: CardData[][] = [];
     for (let i = 0; i < cards.length; i += 8) {
       pages.push(cards.slice(i, i + 8));
     }
 
-    // Generate code for each page
-    const pagesHtml = pages.map((pageCards, pageIndex) => {
-      const pageNum = pageIndex + 1;
+    const totalPages = pages.length;
+    const containerId = `lw-fc-${Date.now()}`;
 
+    // Generate HTML for all pages (all visible in scroll container)
+    const pagesHtml = pages.map((pageCards, pageIndex) => {
       // Extract image IDs for this page
       const imgIds = pageCards.map(c => {
         const match = c.imageUrl.match(/id=([^&]+)/);
@@ -245,37 +244,127 @@ const EmbedGenerator = () => {
       // Build cards data for JS (including lessonCode)
       const cardsDataJs = pageCards.map((c, i) => `['${imgIds[i]}','${c.text.replace(/'/g, "\\'")}','${(c.lessonCode || '').replace(/'/g, "\\'")}']`).join(',');
 
-      const cardsHtml = pageCards.map(c => `        <div style="border:4px solid ${borderColor};border-radius:16px;overflow:hidden;background:#fff;cursor:pointer;position:relative" onclick="var t=this.querySelector('.lw-card-text');t.classList.toggle('hide')">
-            ${c.lessonCode ? `<div class="lw-lesson-code">${c.lessonCode}</div>` : ''}
-            <div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:10px;padding-left:${c.lessonCode ? '20px' : '10px'}"><img src="${c.imageUrl}" style="max-width:100%;max-height:100%;object-fit:contain"></div>
-            <div class="lw-card-text" style="max-height:50px">${c.text}</div>
-        </div>`).join('\n');
+      // Cards HTML
+      const cardsHtml = pageCards.map(c => `                <div style="border:4px solid ${borderColor};border-radius:16px;overflow:hidden;background:#fff;cursor:pointer;position:relative" onclick="var t=this.querySelector('.lw-card-text');t.classList.toggle('hide')">
+                    ${c.lessonCode ? `<div class="lw-lesson-code">${c.lessonCode}</div>` : ''}
+                    <div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:10px;padding-left:${c.lessonCode ? '20px' : '10px'}"><img src="${c.imageUrl}" style="max-width:100%;max-height:100%;object-fit:contain"></div>
+                    <div class="lw-card-text" style="max-height:50px">${c.text}</div>
+                </div>`).join('\n');
 
-      // Print button with page number
-      const printButton = `    <div style="text-align:center;margin:20px 0">
-        <span style="display:block;font-size:14px;color:#666;margin-bottom:8px;font-weight:600">Pagina ${pageNum}/${totalPages}</span>
-        <button style="background:${borderColor};color:${textColor};border:none;padding:14px 40px;font-size:16px;font-weight:600;border-radius:30px;cursor:pointer" onclick="(function(){var c='${borderColor}';var tc='${textColor}';var d=[${cardsDataJs}];var r=[d[3],d[2],d[1],d[0],d[7],d[6],d[5],d[4]];function mk(a,s){var lc=a[2]?'<div style=&quot;position:absolute;left:0;top:13%;transform:rotate(-90deg);transform-origin:left top;font-size:8px;font-weight:700;color:'+c+';letter-spacing:0.5px;white-space:nowrap;background:'+c+'20;padding:2px 5px;border-radius:3px&quot;>'+a[2]+'</div>':'';return '<div style=&quot;border:2px solid '+c+';border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;height:100%;position:relative&quot;>'+lc+'<div style=&quot;flex:1;display:flex;align-items:center;justify-content:center;padding:8px;min-height:0&quot;><img src=&quot;https://drive.google.com/thumbnail?id='+a[0]+'&amp;sz=w800&quot; style=&quot;max-width:100%;max-height:100%;object-fit:contain&quot;></div><div style=&quot;background:'+c+';color:'+(s?tc:c)+';padding:8px;font-size:14pt;font-weight:bold;text-align:center&quot;>'+a[1]+'</div></div>';}function pg(a,s){var h='<div style=&quot;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:10px;width:100%;height:100%&quot;>';for(var i=0;i<a.length;i++)h+=mk(a[i],s);return h+'</div>';}var w=window.open('','_blank','width=1100,height=800');if(!w){alert('Popup blocker may be active. Please allow popups.');return;}w.document.write('<!DOCTYPE html><html><head><meta charset=&quot;UTF-8&quot;><title>Print Page ${pageNum}</title><style>@page{size:A4 landscape;margin:10mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}body{margin:0;font-family:Arial}</style></head><body><div style=&quot;width:100%;height:100vh;padding:10px;box-sizing:border-box&quot;>'+pg(d,true)+'</div><div style=&quot;page-break-before:always;width:100%;height:100vh;padding:10px;box-sizing:border-box&quot;>'+pg(r,false)+'</div><sc'+'ript>setTimeout(function(){window.print();},800);</sc'+'ript></body></html>');w.document.close();})()">🖨️ Print Pagina ${pageNum}/${totalPages} (Double-sided)</button>
-    </div>`;
+      // Print button for this page
+      const printButton = `            <button style="display:block;margin:25px auto;background:${borderColor};color:${textColor};border:none;padding:14px 40px;font-size:16px;font-weight:600;border-radius:30px;cursor:pointer" onclick="(function(){var c='${borderColor}';var tc='${textColor}';var d=[${cardsDataJs}];var r=[d[3],d[2],d[1],d[0],d[7],d[6],d[5],d[4]];function mk(a,s){var lc=a[2]?'<div style=&quot;position:absolute;left:0;top:13%;transform:rotate(-90deg);transform-origin:left top;font-size:8px;font-weight:700;color:'+c+';letter-spacing:0.5px;white-space:nowrap;background:'+c+'20;padding:2px 5px;border-radius:3px&quot;>'+a[2]+'</div>':'';return '<div style=&quot;border:2px solid '+c+';border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;height:100%;position:relative&quot;>'+lc+'<div style=&quot;flex:1;display:flex;align-items:center;justify-content:center;padding:8px;min-height:0&quot;><img src=&quot;https://drive.google.com/thumbnail?id='+a[0]+'&amp;sz=w800&quot; style=&quot;max-width:100%;max-height:100%;object-fit:contain&quot;></div><div style=&quot;background:'+c+';color:'+(s?tc:c)+';padding:8px;font-size:14pt;font-weight:bold;text-align:center&quot;>'+a[1]+'</div></div>';}function pg(a,s){var h='<div style=&quot;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:10px;width:100%;height:100%&quot;>';for(var i=0;i<a.length;i++)h+=mk(a[i],s);return h+'</div>';}var w=window.open('','_blank','width=1100,height=800');if(!w){alert('Popup blocker may be active. Please allow popups.');return;}w.document.write('<!DOCTYPE html><html><head><meta charset=&quot;UTF-8&quot;><title>Print Page ${pageIndex + 1}</title><style>@page{size:A4 landscape;margin:10mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}body{margin:0;font-family:Arial}</style></head><body><div style=&quot;width:100%;height:100vh;padding:10px;box-sizing:border-box&quot;>'+pg(d,true)+'</div><div style=&quot;page-break-before:always;width:100%;height:100vh;padding:10px;box-sizing:border-box&quot;>'+pg(r,false)+'</div><sc'+'ript>setTimeout(function(){window.print();},800);</sc'+'ript></body></html>');w.document.close();})()">🖨️ Print${totalPages > 1 ? ` Pagina ${pageIndex + 1}` : ''} (Double-sided)</button>`;
 
-      return `    <!-- Page ${pageNum} -->
-    <div class="lw-flashcard-page" data-page="${pageNum}">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      return `            <div class="lw-fc-page" data-page="${pageIndex}" style="padding:0 10px">
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
 ${cardsHtml}
-        </div>
+                </div>
 ${printButton}
-    </div>${pageIndex < totalPages - 1 ? '\n    <hr style="border:none;border-top:2px dashed #ddd;margin:30px 0">' : ''}`;
+            </div>`;
     }).join('\n');
 
-    return `<!-- LearnWorlds Flashcard Embed - Multi-Page (${cards.length} cards, ${totalPages} pages) -->
+    // Navigation HTML (only if multiple pages)
+    const navigationHtml = totalPages > 1 ? `
+    <!-- Navigation -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <button class="lw-fc-prev" style="padding:10px 20px;border-radius:12px;border:none;background:#f3f4f6;font-weight:bold;cursor:pointer">← Vorige</button>
+        <div style="display:flex;align-items:center;gap:12px">
+            <span class="lw-fc-indicator" style="background:${borderColor};color:#fff;padding:8px 20px;border-radius:20px;font-weight:bold;font-size:14px">📄 Pagina 1 van ${totalPages}</span>
+            <div style="display:flex;gap:8px">
+${pages.map((_, i) => `                <span class="lw-fc-dot" data-dot="${i}" style="width:12px;height:12px;border-radius:50%;background:${borderColor};opacity:${i === 0 ? '1' : '0.4'};cursor:pointer"></span>`).join('\n')}
+            </div>
+        </div>
+        <button class="lw-fc-next" style="padding:10px 20px;border-radius:12px;border:none;background:#f3f4f6;font-weight:bold;cursor:pointer">Volgende →</button>
+    </div>` : '';
+
+    // Navigation JavaScript (only if multiple pages) - includes scroll handling
+    const navigationJs = totalPages > 1 ? `
+<script>
+(function(){
+    var container = document.getElementById('${containerId}');
+    var scrollContainer = container.querySelector('.lw-fc-scroll');
+    var totalPages = ${totalPages};
+    
+    function getCurrentPage() {
+        var scrollLeft = scrollContainer.scrollLeft;
+        var pageWidth = scrollContainer.offsetWidth;
+        return Math.round(scrollLeft / pageWidth);
+    }
+    
+    function updateIndicators() {
+        var currentPage = getCurrentPage();
+        var dots = container.querySelectorAll('.lw-fc-dot');
+        var indicator = container.querySelector('.lw-fc-indicator');
+        var prevBtn = container.querySelector('.lw-fc-prev');
+        var nextBtn = container.querySelector('.lw-fc-next');
+        
+        dots.forEach(function(d, i) { d.style.opacity = i === currentPage ? '1' : '0.4'; });
+        indicator.textContent = '📄 Pagina ' + (currentPage + 1) + ' van ' + totalPages;
+        prevBtn.style.opacity = currentPage === 0 ? '0.4' : '1';
+        prevBtn.style.pointerEvents = currentPage === 0 ? 'none' : 'auto';
+        nextBtn.style.opacity = currentPage === totalPages - 1 ? '0.4' : '1';
+        nextBtn.style.pointerEvents = currentPage === totalPages - 1 ? 'none' : 'auto';
+    }
+    
+    function scrollToPage(page) {
+        var pageWidth = scrollContainer.offsetWidth;
+        scrollContainer.scrollTo({ left: pageWidth * page, behavior: 'smooth' });
+    }
+    
+    // Listen for scroll events to update indicator
+    scrollContainer.addEventListener('scroll', updateIndicators);
+    
+    // Page-by-page wheel scroll with debounce
+    var isScrolling = false;
+    scrollContainer.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        if (isScrolling) return;
+        
+        var currentPage = getCurrentPage();
+        if (e.deltaY > 10 && currentPage < totalPages - 1) {
+            isScrolling = true;
+            scrollToPage(currentPage + 1);
+            setTimeout(function() { isScrolling = false; }, 500);
+        } else if (e.deltaY < -10 && currentPage > 0) {
+            isScrolling = true;
+            scrollToPage(currentPage - 1);
+            setTimeout(function() { isScrolling = false; }, 500);
+        }
+    }, { passive: false });
+    
+    // Button clicks
+    container.querySelector('.lw-fc-prev').addEventListener('click', function() {
+        scrollToPage(Math.max(0, getCurrentPage() - 1));
+    });
+    container.querySelector('.lw-fc-next').addEventListener('click', function() {
+        scrollToPage(Math.min(totalPages - 1, getCurrentPage() + 1));
+    });
+    
+    // Dot clicks
+    container.querySelectorAll('.lw-fc-dot').forEach(function(dot, i) {
+        dot.addEventListener('click', function() { scrollToPage(i); });
+    });
+    
+    updateIndicators();
+})();
+<\/script>` : '';
+
+    return `<!-- LearnWorlds Flashcard Embed - Swipe/Scroll + Double-sided Print -->
 <style>
 .lw-card-text{transition:all 0.5s cubic-bezier(0.4,0,0.2,1);transform-origin:top;background:${borderColor};padding:12px;font-size:18px;font-weight:700;text-align:center;color:${textColor}}
 .lw-card-text.hide{max-height:0!important;opacity:0;transform:scaleY(0);filter:blur(4px);padding:0 12px}
 .lw-lesson-code{position:absolute;left:0;top:13%;transform:rotate(-90deg);transform-origin:left top;font-size:9px;font-weight:700;color:${borderColor};letter-spacing:0.5px;white-space:nowrap;background:${borderColor}20;padding:3px 6px;border-radius:4px}
+.lw-fc-scroll{display:flex;flex-wrap:nowrap;overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+.lw-fc-scroll::-webkit-scrollbar{display:none}
+.lw-fc-page{flex-shrink:0;width:100%;scroll-snap-align:start;box-sizing:border-box}
 </style>
-<div style="max-width:1200px;margin:30px auto;padding:20px;font-family:Arial,sans-serif">
+<div id="${containerId}" style="max-width:1200px;margin:30px auto;padding:20px;font-family:Arial,sans-serif">
+${navigationHtml}
+    <!-- Scrollable Pages Container -->
+    <div class="lw-fc-scroll">
 ${pagesHtml}
-    <p style="text-align:center;font-size:12px;color:#888;margin-top:20px">💡 Click on a card to hide/show the text</p>
-</div>`;
+    </div>
+    <p style="text-align:center;font-size:12px;color:#888;margin-top:10px">💡 Click on a card to hide/show the text${totalPages > 1 ? ' • Swipe or use arrows to navigate' : ''}</p>
+</div>${navigationJs}`;
   }, [cards, borderColor, textColor]);
 
   const copyToClipboard = async () => {
@@ -350,22 +439,26 @@ ${pagesHtml}
           <TabsContent value="editor" className="animate-pop-in">
             <div className="card-playful p-6 border-primary/20">
               {/* Card Count Selector */}
-              <div className="flex items-center justify-center gap-4 mb-6 p-4 bg-muted/30 rounded-2xl">
-                <Label className="font-bold text-foreground">Aantal kaarten:</Label>
+              <div className="flex items-center justify-center gap-4 mb-6 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl border border-primary/20">
+                <span className="font-bold text-foreground flex items-center gap-2">
+                  📊 Aantal kaarten:
+                </span>
                 <div className="flex gap-2">
                   {([8, 16, 24] as const).map((count) => (
-                    <Button
+                    <button
                       key={count}
-                      variant={cardCount === count ? "default" : "outline"}
-                      className={`rounded-xl font-bold px-6 ${cardCount === count ? 'bg-primary text-primary-foreground' : ''}`}
                       onClick={() => handleCardCountChange(count)}
+                      className={`px-6 py-2 rounded-xl font-bold transition-all ${cardCount === count
+                        ? 'bg-primary text-white shadow-lg scale-105'
+                        : 'bg-muted hover:bg-muted/80 text-foreground hover:scale-102'
+                        }`}
                     >
                       {count}
-                    </Button>
+                    </button>
                   ))}
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  ({Math.ceil(cardCount / 8)} pagina{cardCount > 8 ? "'s" : ""})
+                  ({cardCount === 8 ? '1 pagina' : cardCount === 16 ? '2 paginas' : '3 paginas'})
                 </span>
               </div>
 
@@ -414,7 +507,7 @@ ${pagesHtml}
                   <Textarea
                     value={bulkTexts}
                     onChange={(e) => setBulkTexts(e.target.value)}
-                    placeholder="Write one text per line (8 total):&#10;Monkey&#10;Lion&#10;Elephant&#10;..."
+                    placeholder={`Write one text per line (${cardCount} total):\nMonkey\nLion\nElephant\n...`}
                     className="input-playful text-sm min-h-[120px] mb-3"
                   />
                   <Button
@@ -607,7 +700,7 @@ ${pagesHtml}
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </div >
   );
 };
 
