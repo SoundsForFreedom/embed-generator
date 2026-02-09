@@ -117,6 +117,7 @@ const fetchFilenameFromAPI = async (fileId: string): Promise<string> => {
 };
 
 const EmbedGenerator = () => {
+  const [cardCount, setCardCount] = useState<8 | 16 | 24>(8);
   const [cards, setCards] = useState<CardData[]>(defaultCards);
   const [borderColor, setBorderColor] = useState("#FF6B9D");
   const [textColor, setTextColor] = useState("#FFFFFF");
@@ -124,6 +125,24 @@ const EmbedGenerator = () => {
   const [bulkLinks, setBulkLinks] = useState("");
   const [bulkTexts, setBulkTexts] = useState("");
   const [isLoadingFilenames, setIsLoadingFilenames] = useState(false);
+
+  // Handle card count change
+  const handleCardCountChange = (newCount: 8 | 16 | 24) => {
+    setCardCount(newCount);
+    setCards(prev => {
+      if (newCount > prev.length) {
+        // Add new empty cards
+        return [...prev, ...Array(newCount - prev.length).fill(null).map((_, i) => ({
+          imageUrl: "",
+          text: `Card ${prev.length + i + 1}`,
+          lessonCode: "",
+        }))];
+      } else {
+        // Trim cards
+        return prev.slice(0, newCount);
+      }
+    });
+  };
 
   const updateCard = (index: number, field: keyof CardData, value: string) => {
     const newCards = [...cards];
@@ -142,7 +161,7 @@ const EmbedGenerator = () => {
     setCards(prevCards => {
       const updatedCards = [...prevCards];
       links.forEach((link, i) => {
-        if (i < 8) {
+        if (i < cardCount) {
           updatedCards[i] = {
             ...updatedCards[i],
             imageUrl: convertGoogleDriveLink(link.trim()),
@@ -151,7 +170,7 @@ const EmbedGenerator = () => {
       });
       return updatedCards;
     });
-    toast.success(`${Math.min(links.length, 8)} image links applied!`);
+    toast.success(`${Math.min(links.length, cardCount)} image links applied!`);
 
     // Then, fetch filenames from API in background
     setIsLoadingFilenames(true);
@@ -159,7 +178,7 @@ const EmbedGenerator = () => {
     // Collect all filename results first
     const filenameResults: { index: number; filename: string }[] = [];
 
-    const promises = links.slice(0, 8).map(async (link, i) => {
+    const promises = links.slice(0, cardCount).map(async (link, i) => {
       const fileId = extractFileId(link.trim());
       if (fileId) {
         const filename = await fetchFilenameFromAPI(fileId);
@@ -197,40 +216,65 @@ const EmbedGenerator = () => {
     const texts = bulkTexts.split("\n").filter(t => t.trim());
     const newCards = [...cards];
     texts.forEach((text, i) => {
-      if (i < 8) {
+      if (i < cardCount) {
         newCards[i] = { ...newCards[i], text: text.trim() };
       }
     });
     setCards(newCards);
-    toast.success(`${Math.min(texts.length, 8)} texts applied!`);
+    toast.success(`${Math.min(texts.length, cardCount)} texts applied!`);
   };
 
   const generatedCode = useMemo(() => {
-    // Extract image IDs for popup printing
-    const imgIds = cards.map(c => {
-      const match = c.imageUrl.match(/id=([^&]+)/);
-      return match ? match[1] : '';
-    });
+    // Split cards into pages of 8
+    const totalPages = Math.ceil(cards.length / 8);
+    const pages: CardData[][] = [];
+    for (let i = 0; i < cards.length; i += 8) {
+      pages.push(cards.slice(i, i + 8));
+    }
 
-    // Build cards data for JS (including lessonCode)
-    const cardsDataJs = cards.map((c, i) => `['${imgIds[i]}','${c.text.replace(/'/g, "\\'")}','${(c.lessonCode || '').replace(/'/g, "\\'")}']`).join(',');
+    // Generate code for each page
+    const pagesHtml = pages.map((pageCards, pageIndex) => {
+      const pageNum = pageIndex + 1;
 
-    return `<!-- LearnWorlds Flashcard Embed - Double-sided Print + Magic Effect -->
+      // Extract image IDs for this page
+      const imgIds = pageCards.map(c => {
+        const match = c.imageUrl.match(/id=([^&]+)/);
+        return match ? match[1] : '';
+      });
+
+      // Build cards data for JS (including lessonCode)
+      const cardsDataJs = pageCards.map((c, i) => `['${imgIds[i]}','${c.text.replace(/'/g, "\\'")}','${(c.lessonCode || '').replace(/'/g, "\\'")}']`).join(',');
+
+      const cardsHtml = pageCards.map(c => `        <div style="border:4px solid ${borderColor};border-radius:16px;overflow:hidden;background:#fff;cursor:pointer;position:relative" onclick="var t=this.querySelector('.lw-card-text');t.classList.toggle('hide')">
+            ${c.lessonCode ? `<div class="lw-lesson-code">${c.lessonCode}</div>` : ''}
+            <div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:10px;padding-left:${c.lessonCode ? '20px' : '10px'}"><img src="${c.imageUrl}" style="max-width:100%;max-height:100%;object-fit:contain"></div>
+            <div class="lw-card-text" style="max-height:50px">${c.text}</div>
+        </div>`).join('\n');
+
+      // Print button with page number
+      const printButton = `    <div style="text-align:center;margin:20px 0">
+        <span style="display:block;font-size:14px;color:#666;margin-bottom:8px;font-weight:600">Pagina ${pageNum}/${totalPages}</span>
+        <button style="background:${borderColor};color:${textColor};border:none;padding:14px 40px;font-size:16px;font-weight:600;border-radius:30px;cursor:pointer" onclick="(function(){var c='${borderColor}';var tc='${textColor}';var d=[${cardsDataJs}];var r=[d[3],d[2],d[1],d[0],d[7],d[6],d[5],d[4]];function mk(a,s){var lc=a[2]?'<div style=&quot;position:absolute;left:0;top:13%;transform:rotate(-90deg);transform-origin:left top;font-size:8px;font-weight:700;color:'+c+';letter-spacing:0.5px;white-space:nowrap;background:'+c+'20;padding:2px 5px;border-radius:3px&quot;>'+a[2]+'</div>':'';return '<div style=&quot;border:2px solid '+c+';border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;height:100%;position:relative&quot;>'+lc+'<div style=&quot;flex:1;display:flex;align-items:center;justify-content:center;padding:8px;min-height:0&quot;><img src=&quot;https://drive.google.com/thumbnail?id='+a[0]+'&amp;sz=w800&quot; style=&quot;max-width:100%;max-height:100%;object-fit:contain&quot;></div><div style=&quot;background:'+c+';color:'+(s?tc:c)+';padding:8px;font-size:14pt;font-weight:bold;text-align:center&quot;>'+a[1]+'</div></div>';}function pg(a,s){var h='<div style=&quot;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:10px;width:100%;height:100%&quot;>';for(var i=0;i<a.length;i++)h+=mk(a[i],s);return h+'</div>';}var w=window.open('','_blank','width=1100,height=800');if(!w){alert('Popup blocker may be active. Please allow popups.');return;}w.document.write('<!DOCTYPE html><html><head><meta charset=&quot;UTF-8&quot;><title>Print Page ${pageNum}</title><style>@page{size:A4 landscape;margin:10mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}body{margin:0;font-family:Arial}</style></head><body><div style=&quot;width:100%;height:100vh;padding:10px;box-sizing:border-box&quot;>'+pg(d,true)+'</div><div style=&quot;page-break-before:always;width:100%;height:100vh;padding:10px;box-sizing:border-box&quot;>'+pg(r,false)+'</div><sc'+'ript>setTimeout(function(){window.print();},800);</sc'+'ript></body></html>');w.document.close();})()">🖨️ Print Pagina ${pageNum}/${totalPages} (Double-sided)</button>
+    </div>`;
+
+      return `    <!-- Page ${pageNum} -->
+    <div class="lw-flashcard-page" data-page="${pageNum}">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+${cardsHtml}
+        </div>
+${printButton}
+    </div>${pageIndex < totalPages - 1 ? '\n    <hr style="border:none;border-top:2px dashed #ddd;margin:30px 0">' : ''}`;
+    }).join('\n');
+
+    return `<!-- LearnWorlds Flashcard Embed - Multi-Page (${cards.length} cards, ${totalPages} pages) -->
 <style>
 .lw-card-text{transition:all 0.5s cubic-bezier(0.4,0,0.2,1);transform-origin:top;background:${borderColor};padding:12px;font-size:18px;font-weight:700;text-align:center;color:${textColor}}
 .lw-card-text.hide{max-height:0!important;opacity:0;transform:scaleY(0);filter:blur(4px);padding:0 12px}
 .lw-lesson-code{position:absolute;left:0;top:13%;transform:rotate(-90deg);transform-origin:left top;font-size:9px;font-weight:700;color:${borderColor};letter-spacing:0.5px;white-space:nowrap;background:${borderColor}20;padding:3px 6px;border-radius:4px}
 </style>
 <div style="max-width:1200px;margin:30px auto;padding:20px;font-family:Arial,sans-serif">
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
-${cards.map(c => `        <div style="border:4px solid ${borderColor};border-radius:16px;overflow:hidden;background:#fff;cursor:pointer;position:relative" onclick="var t=this.querySelector('.lw-card-text');t.classList.toggle('hide')">
-            ${c.lessonCode ? `<div class="lw-lesson-code">${c.lessonCode}</div>` : ''}
-            <div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;padding:10px;padding-left:${c.lessonCode ? '20px' : '10px'}"><img src="${c.imageUrl}" style="max-width:100%;max-height:100%;object-fit:contain"></div>
-            <div class="lw-card-text" style="max-height:50px">${c.text}</div>
-        </div>`).join('\n')}
-    </div>
-    <button style="display:block;margin:25px auto;background:${borderColor};color:${textColor};border:none;padding:14px 40px;font-size:16px;font-weight:600;border-radius:30px;cursor:pointer" onclick="(function(){var c='${borderColor}';var tc='${textColor}';var d=[${cardsDataJs}];var r=[d[3],d[2],d[1],d[0],d[7],d[6],d[5],d[4]];function mk(a,s){var lc=a[2]?'<div style=&quot;position:absolute;left:0;top:13%;transform:rotate(-90deg);transform-origin:left top;font-size:8px;font-weight:700;color:'+c+';letter-spacing:0.5px;white-space:nowrap;background:'+c+'20;padding:2px 5px;border-radius:3px&quot;>'+a[2]+'</div>':'';return '<div style=&quot;border:2px solid '+c+';border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;height:100%;position:relative&quot;>'+lc+'<div style=&quot;flex:1;display:flex;align-items:center;justify-content:center;padding:8px;min-height:0&quot;><img src=&quot;https://drive.google.com/thumbnail?id='+a[0]+'&amp;sz=w800&quot; style=&quot;max-width:100%;max-height:100%;object-fit:contain&quot;></div><div style=&quot;background:'+c+';color:'+(s?tc:c)+';padding:8px;font-size:14pt;font-weight:bold;text-align:center&quot;>'+a[1]+'</div></div>';}function pg(a,s){var h='<div style=&quot;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:10px;width:100%;height:100%&quot;>';for(var i=0;i<a.length;i++)h+=mk(a[i],s);return h+'</div>';}var w=window.open('','_blank','width=1100,height=800');if(!w){alert('Popup blocker may be active. Please allow popups.');return;}w.document.write('<!DOCTYPE html><html><head><meta charset=&quot;UTF-8&quot;><title>Print</title><style>@page{size:A4 landscape;margin:10mm}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;box-sizing:border-box}body{margin:0;font-family:Arial}</style></head><body><div style=&quot;width:100%;height:100vh;padding:10px;box-sizing:border-box&quot;>'+pg(d,true)+'</div><div style=&quot;page-break-before:always;width:100%;height:100vh;padding:10px;box-sizing:border-box&quot;>'+pg(r,false)+'</div><sc'+'ript>setTimeout(function(){window.print();},800);</sc'+'ript></body></html>');w.document.close();})()">🖨️ Print (Double-sided)</button>
-    <p style="text-align:center;font-size:12px;color:#888;margin-top:10px">💡 Click on a card to hide/show the text</p>
+${pagesHtml}
+    <p style="text-align:center;font-size:12px;color:#888;margin-top:20px">💡 Click on a card to hide/show the text</p>
 </div>`;
   }, [cards, borderColor, textColor]);
 
@@ -305,6 +349,26 @@ ${cards.map(c => `        <div style="border:4px solid ${borderColor};border-rad
           {/* Editor Tab */}
           <TabsContent value="editor" className="animate-pop-in">
             <div className="card-playful p-6 border-primary/20">
+              {/* Card Count Selector */}
+              <div className="flex items-center justify-center gap-4 mb-6 p-4 bg-muted/30 rounded-2xl">
+                <Label className="font-bold text-foreground">Aantal kaarten:</Label>
+                <div className="flex gap-2">
+                  {([8, 16, 24] as const).map((count) => (
+                    <Button
+                      key={count}
+                      variant={cardCount === count ? "default" : "outline"}
+                      className={`rounded-xl font-bold px-6 ${cardCount === count ? 'bg-primary text-primary-foreground' : ''}`}
+                      onClick={() => handleCardCountChange(count)}
+                    >
+                      {count}
+                    </Button>
+                  ))}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  ({Math.ceil(cardCount / 8)} pagina{cardCount > 8 ? "'s" : ""})
+                </span>
+              </div>
+
               {/* Bulk Paste Section */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                 {/* Bulk Links */}
@@ -316,7 +380,7 @@ ${cards.map(c => `        <div style="border:4px solid ${borderColor};border-rad
                   <Textarea
                     value={bulkLinks}
                     onChange={(e) => setBulkLinks(e.target.value)}
-                    placeholder="Paste one link per line (8 total):&#10;https://drive.google.com/file/d/.../view&#10;https://drive.google.com/file/d/.../view&#10;..."
+                    placeholder={`Paste one link per line (${cardCount} total):\nhttps://drive.google.com/file/d/.../view\nhttps://drive.google.com/file/d/.../view\n...`}
                     className="input-playful text-sm font-mono min-h-[120px] mb-3"
                   />
                   <Button
